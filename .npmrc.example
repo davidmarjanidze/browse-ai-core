@@ -1,0 +1,2 @@
+# Copy to ~/.npmrc or pass the token on the command line. Never commit a token.
+//registry.npmjs.org/:_authToken=${NPM_TOKEN}

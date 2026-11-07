@@ -1,0 +1,41 @@
+<main
+  style="
+    font-family: system-ui;
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 16px;
+  "
+>
+  <h1>browse-ai-core demo</h1>
+  <p style="display: flex; flex-wrap: wrap; gap: 8px">
+    <label>
+      Palette
+      <select (change)="setPalette($event)">
+        @for (name of palettes; track name) {
+          <option [value]="name">{{ name }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      Theme
+      <select (change)="setTheme($event)">
+        <option value="system">system</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+      </select>
+    </label>
+    <button type="button" (click)="open.set(!open())">Toggle chat</button>
+  </p>
+
+  <form style="display: flex; flex-wrap: wrap; gap: 8px">
+    <label>Name <input name="name" /></label>
+    <label>Email <input name="email" type="email" /></label>
+  </form>
+
+  <h2>Inline chat</h2>
+  <div style="height: 480px">
+    <browse-ai-core mode="inline" [palette]="palette()" [theme]="theme()" />
+  </div>
+</main>
+
+<browse-ai-core [palette]="palette()" [theme]="theme()" [(open)]="open" />

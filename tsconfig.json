@@ -1,0 +1,36 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "browse-ai-core": ["./projects/browse-ai-core/src/public-api.ts"],
+      "browse-ai-core/angular": [
+        "./projects/browse-ai-core/angular/src/public-api.ts"
+      ]
+    },
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"]
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./projects/browse-ai-core/tsconfig.lib.json" },
+    { "path": "./projects/browse-ai-core/tsconfig.spec.json" },
+    { "path": "./projects/element/tsconfig.app.json" },
+    { "path": "./projects/demo/tsconfig.app.json" }
+  ]
+}

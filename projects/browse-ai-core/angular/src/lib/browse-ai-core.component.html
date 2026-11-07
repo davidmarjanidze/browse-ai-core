@@ -1,0 +1,52 @@
+<div
+  class="contents"
+  [attr.data-layout]="layout()"
+  [attr.data-position]="resolvedPosition()"
+  [attr.data-mode]="themeStore.mode()"
+>
+  @if (layout() !== 'inline' && !panel.isOpen()) {
+    <bac-launcher class="bac-launcher">
+      <ng-content select="[slot=launcher-icon]">
+        <bac-sparkles-icon class="size-7" />
+      </ng-content>
+    </bac-launcher>
+  }
+
+  @if (panel.isOpen()) {
+    <section
+      #panelElement
+      part="panel"
+      class="bac-panel"
+      [class.bac-panel-in]="layout() !== 'inline'"
+      [attr.role]="layout() === 'inline' ? 'region' : 'dialog'"
+      [attr.aria-label]="t().title"
+      (keydown)="onPanelKeydown($event)"
+    >
+      <bac-chat-header>
+        <ng-content select="[slot=header]" />
+      </bac-chat-header>
+
+      @switch (panel.panel()) {
+        @case ('settings') {
+          <bac-settings-panel />
+        }
+        @case ('bookmarks') {
+          <bac-bookmarks-panel />
+        }
+        @default {
+          <bac-message-list>
+            <ng-content select="[slot=empty-state]">
+              <bac-empty-state />
+            </ng-content>
+          </bac-message-list>
+          <bac-composer />
+        }
+      }
+
+      <ng-content select="[slot=footer]" />
+      <bac-toast-outlet />
+    </section>
+  }
+
+  <bac-selection-actions />
+</div>

@@ -1,0 +1,18 @@
+<div
+  role="radiogroup"
+  class="inline-flex h-full max-w-full items-stretch overflow-hidden rounded-bac border border-bac-border bg-bac-surface"
+  [attr.aria-label]="ariaLabel() || null"
+>
+  @for (option of options(); track option.value) {
+    <button
+      type="button"
+      role="radio"
+      class="inline-flex min-h-9 pointer-coarse:min-h-11 max-w-40 items-center justify-center border-r border-bac-border px-3 text-sm text-bac-text-muted transition-colors last:border-r-0 hover:bg-bac-surface-hover disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-bac-primary aria-checked:bg-bac-bg aria-checked:font-semibold aria-checked:text-bac-text"
+      [attr.aria-checked]="value() === option.value"
+      [disabled]="disabled()"
+      (click)="select(option.value)"
+    >
+      <span class="truncate">{{ option.label }}</span>
+    </button>
+  }
+</div>

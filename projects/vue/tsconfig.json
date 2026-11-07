@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "declaration": true,
+    "skipLibCheck": true,
+    "outDir": "../../dist/browse-ai-core/vue",
+    "rootDir": "src",
+    "types": [],
+    "paths": {
+      "browse-ai-core": ["../../dist/browse-ai-core/types/browse-ai-core.d.ts"],
+      "browse-ai-core/element": ["../element/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}

@@ -1,0 +1,33 @@
+<button
+  type="button"
+  class="min-h-10 pointer-coarse:min-h-11 w-full rounded-bac bg-bac-primary px-4 py-2.5 text-sm font-semibold text-bac-on-primary transition-colors hover:bg-bac-primary-hover disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bac-primary"
+  [disabled]="isDownloading()"
+  (click)="download.emit()"
+>
+  {{ isDownloading() ? downloadingLabel() : label() }}
+</button>
+
+@if (isDownloading()) {
+  <div
+    role="progressbar"
+    class="mt-3 h-2 overflow-hidden rounded-full bg-bac-surface-hover"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-valuenow]="progress()"
+  >
+    <div
+      class="h-full bg-bac-primary transition-[width]"
+      [style.width.%]="progress()"
+    ></div>
+  </div>
+}
+
+@if (note(); as note) {
+  <p class="mt-2 text-center text-xs text-bac-text-muted">{{ note }}</p>
+}
+
+@if (error(); as error) {
+  <p role="alert" class="mt-2 text-center text-xs text-bac-danger">
+    {{ error }}
+  </p>
+}

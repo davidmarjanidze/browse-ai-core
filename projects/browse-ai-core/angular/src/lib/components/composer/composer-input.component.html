@@ -1,0 +1,78 @@
+<bac-auto-resize-textarea
+  class="min-w-0 flex-1"
+  [placeholder]="t().inputPlaceholder"
+  [disabled]="session.isBusy()"
+  [(value)]="session.prompt"
+  (focused)="session.onComposerFocus()"
+  (submitted)="session.send()"
+/>
+
+<input
+  #imageInput
+  type="file"
+  accept="image/*"
+  class="hidden"
+  tabindex="-1"
+  aria-hidden="true"
+  (change)="onFile($event, 'image')"
+/>
+<input
+  #audioInput
+  type="file"
+  accept="audio/*"
+  class="hidden"
+  tabindex="-1"
+  aria-hidden="true"
+  (change)="onFile($event, 'audio')"
+/>
+
+@if (attachmentItems().length) {
+  <bac-menu
+    #menu
+    [items]="attachmentItems()"
+    [label]="t().attachments"
+    openDirection="up"
+    (itemSelected)="onAttachment($event, imageInput, audioInput)"
+  >
+    <button
+      menuTrigger
+      type="button"
+      part="attach-button"
+      [class]="actionClasses"
+      [attr.aria-label]="t().attachments"
+      [attr.title]="t().attachments"
+      [disabled]="attachmentsDisabled()"
+    >
+      <bac-icon
+        class="size-4 transition-transform"
+        name="plus"
+        [class.rotate-45]="menu.isOpen()"
+      />
+    </button>
+  </bac-menu>
+}
+
+@if (session.isBusy()) {
+  <button
+    type="button"
+    part="stop-button"
+    [class]="actionClasses"
+    [attr.aria-label]="t().stop"
+    [attr.title]="t().stop"
+    (click)="session.stop()"
+  >
+    <bac-icon class="size-4" name="stop" />
+  </button>
+} @else {
+  <button
+    type="button"
+    part="send-button"
+    [class]="actionClasses"
+    [attr.aria-label]="t().send"
+    [attr.title]="t().send"
+    [disabled]="!session.canSend()"
+    (click)="session.send()"
+  >
+    <bac-icon class="size-4" name="send" />
+  </button>
+}

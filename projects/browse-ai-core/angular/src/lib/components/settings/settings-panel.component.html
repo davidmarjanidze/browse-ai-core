@@ -1,0 +1,136 @@
+@let strings = t();
+<div class="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
+  @if (features().appearance) {
+    <section class="space-y-4">
+      <h3 class="text-base font-semibold">{{ strings.appearance }}</h3>
+      <div>
+        <p class="mb-2 text-sm font-semibold text-bac-text-muted">
+          {{ strings.theme }}
+        </p>
+        <bac-toggle-group
+          [ariaLabel]="strings.theme"
+          [options]="themeOptions()"
+          [value]="theme.theme()"
+          (valueChange)="setTheme($event)"
+        />
+      </div>
+      <div>
+        <p
+          class="mb-2 text-sm font-semibold text-bac-text-muted"
+          id="bac-palette-label"
+        >
+          {{ strings.palette }}
+        </p>
+        <div
+          role="radiogroup"
+          aria-labelledby="bac-palette-label"
+          class="flex flex-wrap gap-2"
+        >
+          @for (palette of palettes(); track palette.name) {
+            <button
+              type="button"
+              role="radio"
+              class="size-8 pointer-coarse:size-11 rounded-full border-2 border-bac-bg ring-2 ring-transparent transition-shadow hover:ring-bac-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bac-primary aria-checked:ring-bac-text"
+              [style.background]="palette.color"
+              [attr.aria-checked]="theme.palette() === palette.name"
+              [attr.aria-label]="palette.name"
+              [attr.title]="palette.name"
+              (click)="setPalette(palette.name)"
+            ></button>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (features().selectionActions) {
+    <section>
+      <div
+        class="flex items-start justify-between gap-3 rounded-bac border border-bac-border px-3 py-3"
+      >
+        <div>
+          <p class="text-sm font-semibold">
+            {{ strings.selectionActionsSetting }}
+          </p>
+          <p class="mt-1 text-xs text-bac-text-muted">
+            {{ strings.selectionActionsSettingText }}
+          </p>
+        </div>
+        <bac-switch
+          [ariaLabel]="strings.selectionActionsSetting"
+          [checked]="selectionActions.enabled()"
+          (checkedChange)="selectionActions.setEnabled($event)"
+        />
+      </div>
+    </section>
+  }
+
+  @if (features().bookmarks) {
+    <section>
+      <h3 class="mb-4 text-base font-semibold">{{ strings.bookmarks }}</h3>
+      <div
+        class="flex items-start justify-between gap-3 rounded-bac border border-bac-border px-3 py-3"
+      >
+        <div>
+          <p class="text-sm font-semibold">{{ strings.bookmarksSetting }}</p>
+          <p class="mt-1 text-xs text-bac-text-muted">
+            {{ strings.bookmarksSettingText }}
+          </p>
+        </div>
+        <bac-switch
+          [ariaLabel]="strings.bookmarksSetting"
+          [checked]="bookmarks.aiBookmarksEnabled()"
+          (checkedChange)="bookmarks.setEnabled($event)"
+        />
+      </div>
+    </section>
+  }
+
+  @if (features().personalization) {
+    <section>
+      <h3 class="mb-4 text-base font-semibold">
+        {{ strings.personalization }}
+      </h3>
+      <label class="mb-4 block">
+        <span class="mb-1 block text-sm font-semibold text-bac-text-muted">
+          {{ strings.nickname }}
+        </span>
+        <input
+          type="text"
+          class="w-full rounded-bac border border-bac-border bg-bac-bg px-3 py-2.5 text-base text-bac-text outline-none placeholder:text-bac-text-muted focus:border-bac-primary focus:ring-2 focus:ring-bac-primary/30 sm:text-sm"
+          [placeholder]="strings.nicknamePlaceholder"
+          [formField]="personalization.nickname"
+        />
+        <span class="mt-1 block text-right text-xs text-bac-text-muted">
+          {{ model().nickname.length }}/{{ nicknameMax }}
+        </span>
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-sm font-semibold text-bac-text-muted">
+          {{ strings.customInstructions }}
+        </span>
+        <textarea
+          rows="4"
+          class="min-h-24 w-full resize-y rounded-bac border border-bac-border bg-bac-bg px-3 py-2.5 text-base text-bac-text outline-none placeholder:text-bac-text-muted focus:border-bac-primary focus:ring-2 focus:ring-bac-primary/30 sm:text-sm"
+          [placeholder]="strings.customInstructionsPlaceholder"
+          [formField]="personalization.customInstructions"
+        ></textarea>
+        <span class="mt-1 block text-right text-xs text-bac-text-muted">
+          {{ model().customInstructions.length }}/{{ instructionsMax }}
+        </span>
+      </label>
+    </section>
+  }
+</div>
+
+@if (features().personalization) {
+  <div class="shrink-0 border-t border-bac-border p-4">
+    <bac-button
+      variant="primary"
+      [fullWidth]="true"
+      [label]="strings.saveSettings"
+      [disabled]="personalization().invalid()"
+      (buttonClick)="save()"
+    />
+  </div>
+}

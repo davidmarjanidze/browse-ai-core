@@ -1,0 +1,140 @@
+@if (session.toolNeedingDownload(); as tool) {
+  @let state = session.builtIn.states()[tool];
+  @let name = session.selectedToolInfo()?.name ?? tool;
+  <div class="mb-3">
+    <p class="mb-2 text-xs text-bac-text-muted">
+      {{ t().toolModelNeeded | bacFormat: { tool: name } }}
+    </p>
+    <bac-model-download
+      [label]="t().downloadToolModel | bacFormat: { tool: name }"
+      [downloadingLabel]="
+        t().downloadingToolModel
+          | bacFormat: { tool: name, percent: state.progress }
+      "
+      [isDownloading]="state.isDownloading"
+      [progress]="state.progress"
+      [error]="state.error"
+      (download)="session.builtIn.download(tool)"
+    />
+  </div>
+}
+
+@if (session.formSuggestionCount() > 0) {
+  <div class="mb-3 flex w-full gap-2">
+    <bac-button
+      class="flex-1"
+      variant="primary"
+      [fullWidth]="true"
+      [label]="t().acceptAll"
+      (buttonClick)="session.acceptAllSuggestions()"
+    />
+    <bac-button
+      class="flex-1"
+      variant="secondary"
+      [fullWidth]="true"
+      [label]="t().dismissAll"
+      (buttonClick)="session.dismissAllSuggestions()"
+    />
+  </div>
+}
+
+@if (session.extractedTables(); as tables) {
+  @if (tables.length) {
+    <div
+      class="mb-2 flex items-center justify-between gap-3 rounded-bac border border-bac-border bg-bac-surface px-3 py-2"
+    >
+      <p class="text-xs">
+        {{ t().tablesReady | bacFormat: { count: tables.length } }}
+      </p>
+      <bac-menu
+        [items]="formatItems()"
+        [label]="t().download"
+        openDirection="up"
+        (itemSelected)="session.downloadTables($event)"
+      >
+        <bac-button
+          menuTrigger
+          variant="secondary"
+          icon="download"
+          [label]="t().download"
+        />
+      </bac-menu>
+    </div>
+  }
+}
+
+@if (session.matchedImages().length; as count) {
+  <div
+    class="mb-2 flex items-center justify-between gap-3 rounded-bac border border-bac-border bg-bac-surface px-3 py-2"
+  >
+    <p class="text-xs">{{ t().imagesReady | bacFormat: { count } }}</p>
+    <bac-button
+      variant="secondary"
+      icon="download"
+      [label]="t().download"
+      (buttonClick)="session.downloadImages()"
+    />
+  </div>
+}
+
+@if (session.context()?.selectedText; as selectedText) {
+  <div
+    class="mb-2 max-h-20 overflow-y-auto text-xs break-words whitespace-pre-wrap text-bac-text-muted"
+  >
+    <span class="font-semibold">{{ t().selectedText }}</span>
+    {{ selectedText }}
+  </div>
+}
+
+@if (session.pageContentReduction() > 0) {
+  <p
+    role="status"
+    class="mb-2 rounded-bac border border-bac-warning bg-bac-warning-soft px-3 py-2 text-xs text-bac-warning"
+  >
+    {{
+      t().pageContentReduced
+        | bacFormat: { percent: session.pageContentReduction() }
+    }}
+  </p>
+}
+
+@if (session.image(); as image) {
+  <div class="group relative mb-2 inline-block">
+    <img
+      [src]="image"
+      [alt]="t().attachedImage"
+      class="max-h-32 max-w-full rounded-bac border border-bac-border"
+    />
+    @if (!session.isBusy()) {
+      <button
+        type="button"
+        class="absolute top-1.5 right-1.5 flex size-6 pointer-coarse:size-9 items-center justify-center rounded-full bg-bac-bg text-bac-text shadow-md focus-visible:outline-2 focus-visible:outline-bac-primary"
+        [attr.aria-label]="t().removeImage"
+        [attr.title]="t().removeImage"
+        (click)="session.image.set(null)"
+      >
+        <bac-icon class="size-3" name="close" />
+      </button>
+    }
+  </div>
+}
+
+@if (session.audio()) {
+  <div
+    class="mb-2 inline-flex items-center gap-2 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"
+  >
+    <bac-icon class="size-3.5" name="audio" />
+    <span class="font-medium">{{ t().audioAttached }}</span>
+    @if (!session.isBusy()) {
+      <button
+        type="button"
+        class="ml-1 flex size-6 pointer-coarse:size-9 items-center justify-center rounded-full bg-bac-bg focus-visible:outline-2 focus-visible:outline-bac-primary"
+        [attr.aria-label]="t().removeAudio"
+        [attr.title]="t().removeAudio"
+        (click)="session.audio.set(null)"
+      >
+        <bac-icon class="size-3" name="close" />
+      </button>
+    }
+  </div>
+}

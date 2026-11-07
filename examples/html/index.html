@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>browse-ai-core in plain HTML</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/browse-ai-core@0.2/element/browse-ai-core.js"
+    ></script>
+    <style>
+      browse-ai-core {
+        --bac-panel-width: 440px;
+        --bac-radius: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My page</h1>
+
+    <browse-ai-core
+      theme="system"
+      palette="sunset"
+      position="bottom-left"
+    ></browse-ai-core>
+
+    <script type="module">
+      const chat = document.querySelector('browse-ai-core')
+      chat.config = {
+        strings: { title: 'Help' },
+        features: { audioInput: false }
+      }
+      chat.addEventListener('responseReceived', (event) => {
+        console.log('Answer:', event.detail.text)
+      })
+    </script>
+  </body>
+</html>

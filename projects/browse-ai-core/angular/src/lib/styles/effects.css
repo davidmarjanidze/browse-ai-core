@@ -1,0 +1,182 @@
+@keyframes bac-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+@keyframes bac-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.bac-pop-in {
+  animation: bac-pop-in 160ms ease-out;
+}
+
+.bac-panel-in {
+  animation: bac-panel-in 200ms ease-out;
+}
+
+/*
+ * Moving glow behind the header and messages while the model thinks.
+ * Colors come from the palette (--bac-thinking*), so they follow the theme.
+ */
+.bac-thinking-surface {
+  position: relative;
+  isolation: isolate;
+  transition: background-color 600ms ease;
+}
+/*
+ * The glow lives in its own layer so only the glow is clipped. Menus and
+ * popovers inside the surface can still open past its edges.
+ */
+.bac-thinking-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bac-thinking-glow::before,
+.bac-thinking-glow::after {
+  content: '';
+  position: absolute;
+  inset: -28%;
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+.bac-thinking-glow::before {
+  background:
+    radial-gradient(
+      circle at 18% 34%,
+      var(--bac-thinking1) 0%,
+      transparent 52%
+    ),
+    radial-gradient(
+      circle at 82% 20%,
+      var(--bac-thinking2) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      circle at 64% 36%,
+      var(--bac-thinking3) 0%,
+      transparent 54%
+    ),
+    radial-gradient(
+      circle at 56% 78%,
+      var(--bac-thinking1-deep) 0%,
+      transparent 64%
+    );
+  filter: blur(26px) saturate(1.24);
+  transform: translate3d(-5%, -4%, 0) scale(1.08);
+}
+.bac-thinking-glow::after {
+  background:
+    radial-gradient(
+      circle at 70% 26%,
+      var(--bac-thinking2-soft) 0%,
+      transparent 46%
+    ),
+    radial-gradient(
+      circle at 38% 20%,
+      var(--bac-thinking3-soft) 0%,
+      transparent 44%
+    ),
+    radial-gradient(
+      circle at 28% 12%,
+      var(--bac-thinking1) 0%,
+      transparent 40%
+    ),
+    linear-gradient(165deg, rgba(5, 15, 10, 0.05), rgba(3, 7, 4, 0.46));
+  mix-blend-mode: var(--bac-thinking-blend, screen);
+  filter: blur(34px);
+  transform: translate3d(4%, 0, 0) scale(1.14);
+}
+/* Only the top part of the message list glows. */
+.bac-thinking-top > .bac-thinking-glow::before,
+.bac-thinking-top > .bac-thinking-glow::after {
+  inset: -28% -24% 42% -24%;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+}
+.bac-thinking-surface.is-thinking {
+  background-color: var(--bac-thinking-surface);
+}
+.is-thinking > .bac-thinking-glow::before,
+.is-thinking > .bac-thinking-glow::after {
+  opacity: 1;
+}
+.is-thinking > .bac-thinking-glow::before {
+  animation: bac-thinking-a 5.4s linear infinite;
+}
+.is-thinking > .bac-thinking-glow::after {
+  animation: bac-thinking-b 5.9s linear infinite;
+}
+
+@keyframes bac-thinking-a {
+  0%,
+  100% {
+    transform: translate3d(-10%, -8%, 0) scale(1.07) rotate(-1deg);
+  }
+  16% {
+    transform: translate3d(3%, -13%, 0) scale(1.18) rotate(1.5deg);
+  }
+  25% {
+    transform: translate3d(11%, -10%, 0) scale(1.2) rotate(2deg);
+  }
+  40% {
+    transform: translate3d(13%, 2%, 0) scale(1.1) rotate(-0.5deg);
+  }
+  50% {
+    transform: translate3d(4%, 9%, 0) scale(1.12) rotate(-2deg);
+  }
+  66% {
+    transform: translate3d(-9%, 12%, 0) scale(1.2) rotate(1deg);
+  }
+  75% {
+    transform: translate3d(-13%, 6%, 0) scale(1.18) rotate(2deg);
+  }
+  90% {
+    transform: translate3d(-12%, -1%, 0) scale(1.09) rotate(-1.5deg);
+  }
+}
+
+@keyframes bac-thinking-b {
+  0%,
+  100% {
+    transform: translate3d(8%, -7%, 0) scale(1.17) rotate(1deg);
+  }
+  14% {
+    transform: translate3d(-3%, 9%, 0) scale(1.07) rotate(-2deg);
+  }
+  25% {
+    transform: translate3d(-10%, 7%, 0) scale(1.08) rotate(-2.2deg);
+  }
+  38% {
+    transform: translate3d(-13%, -4%, 0) scale(1.18) rotate(0.5deg);
+  }
+  50% {
+    transform: translate3d(12%, 4%, 0) scale(1.15) rotate(1.8deg);
+  }
+  63% {
+    transform: translate3d(10%, -10%, 0) scale(1.08) rotate(-1deg);
+  }
+  75% {
+    transform: translate3d(-6%, -11%, 0) scale(1.09) rotate(-2deg);
+  }
+  88% {
+    transform: translate3d(2%, -13%, 0) scale(1.19) rotate(1.2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

@@ -1,0 +1,13 @@
+<textarea
+  #textarea
+  part="input"
+  rows="1"
+  class="min-h-10 pointer-coarse:min-h-11 w-full resize-none rounded-bac border border-bac-border bg-bac-bg px-3 py-2.5 text-base text-bac-text outline-none placeholder:text-bac-text-muted focus:border-bac-primary focus:ring-2 focus:ring-bac-primary/30 sm:text-sm"
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [attr.aria-label]="ariaLabel() || placeholder()"
+  [disabled]="disabled()"
+  (input)="onInput($event)"
+  (focus)="focused.emit()"
+  (keydown)="onKeydown($event)"
+></textarea>

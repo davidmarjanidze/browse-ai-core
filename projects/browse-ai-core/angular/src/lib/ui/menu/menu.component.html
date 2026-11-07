@@ -1,0 +1,35 @@
+<div #root class="relative inline-flex">
+  <div #trigger class="inline-flex" (click)="toggle()">
+    <ng-content select="[menuTrigger]" />
+  </div>
+
+  @if (isOpen()) {
+    <div
+      role="menu"
+      part="menu"
+      class="bac-pop-in absolute z-50 min-w-44 overflow-hidden rounded-bac border border-bac-border bg-bac-bg py-1 text-bac-text shadow-xl"
+      [class.right-0]="align() === 'end'"
+      [class.left-0]="align() === 'start'"
+      [class.top-full]="direction() === 'down'"
+      [class.mt-1.5]="direction() === 'down'"
+      [class.bottom-full]="direction() === 'up'"
+      [class.mb-1.5]="direction() === 'up'"
+      [attr.aria-label]="label() || null"
+    >
+      @for (item of items(); track $index) {
+        <button
+          type="button"
+          role="menuitem"
+          class="flex min-h-9 pointer-coarse:min-h-11 w-full items-center gap-2 px-3.5 text-left text-sm whitespace-nowrap transition-colors hover:bg-bac-surface-hover focus-visible:bg-bac-surface-hover focus-visible:outline-none"
+          (click)="select(item.value)"
+          (keydown)="onItemKeydown($event)"
+        >
+          @if (item.icon) {
+            <bac-icon class="size-4" [name]="item.icon" />
+          }
+          {{ item.label }}
+        </button>
+      }
+    </div>
+  }
+</div>

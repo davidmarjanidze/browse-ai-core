@@ -1,0 +1,73 @@
+{
+  "name": "browse-ai-core",
+  "version": "0.2.0",
+  "description": "AI chat assistant for web pages, running on the browser's built-in model. Works with Angular, React, Vue and plain HTML.",
+  "author": "David Marjanidze",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidmarjanidze/browse-ai-core.git"
+  },
+  "bugs": "https://github.com/davidmarjanidze/browse-ai-core/issues",
+  "homepage": "https://github.com/davidmarjanidze/browse-ai-core#readme",
+  "keywords": [
+    "ai",
+    "chat",
+    "assistant",
+    "gemini nano",
+    "prompt api",
+    "angular",
+    "react",
+    "vue",
+    "web component"
+  ],
+  "exports": {
+    "./element": {
+      "types": "./element/index.d.ts",
+      "default": "./element/browse-ai-core.js"
+    },
+    "./react": {
+      "types": "./react/index.d.ts",
+      "default": "./react/index.js"
+    },
+    "./vue": {
+      "types": "./vue/index.d.ts",
+      "default": "./vue/index.js"
+    }
+  },
+  "peerDependencies": {
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "react": "^19.0.0",
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@angular/common": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/forms": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@fortawesome/free-regular-svg-icons": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "marked": "^18.0.9",
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": [
+    "./element/*.js",
+    "./react/*.js",
+    "./vue/*.js"
+  ]
+}
