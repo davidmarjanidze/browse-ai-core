@@ -1,0 +1,10 @@
+<h1>My app</h1>
+<button type="button" (click)="open.set(true)">Ask AI</button>
+
+<browse-ai-core
+  theme="system"
+  position="bottom-right"
+  [config]="{ strings: { title: 'Help' } }"
+  [(open)]="open"
+  (messageSent)="onMessageSent($event)"
+/>

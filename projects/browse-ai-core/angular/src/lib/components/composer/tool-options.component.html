@@ -1,0 +1,102 @@
+@let strings = t();
+@if (tool() === 'reply-drafter') {
+  <div class="mb-3 flex flex-wrap gap-2">
+    <bac-select
+      class="min-w-28 flex-1"
+      [ariaLabel]="strings.tone"
+      [options]="toneOptions()"
+      [disabled]="session.isBusy()"
+      [value]="reply.tone()"
+      (valueChange)="setTone($event)"
+    />
+    <bac-select
+      class="min-w-28 flex-1"
+      [ariaLabel]="strings.length"
+      [options]="lengthOptions()"
+      [disabled]="session.isBusy()"
+      [value]="reply.length()"
+      (valueChange)="setLength($event)"
+    />
+  </div>
+}
+
+@if (usesField()) {
+  <div
+    role="status"
+    class="mb-3 flex items-center justify-between gap-2 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"
+  >
+    <span class="min-w-0 truncate">
+      @if (tracker.isPicking()) {
+        {{ strings.fieldPickerActive }}
+      } @else if (tracker.fieldLabel()) {
+        <span class="font-semibold">{{ strings.targetField }}</span>
+        {{ tracker.fieldLabel() }}
+      } @else {
+        {{ strings.noTargetField }}
+      }
+    </span>
+    <bac-button
+      variant="secondary"
+      [label]="strings.pickField"
+      (buttonClick)="pickField()"
+    />
+  </div>
+}
+
+@if (tool() === 'research-notes') {
+  @if (naming()) {
+    <form
+      class="mb-3 flex gap-2"
+      (submit)="$event.preventDefault(); saveName()"
+    >
+      <input
+        class="min-w-0 flex-1 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-sm text-bac-text focus-visible:outline-2 focus-visible:outline-bac-primary"
+        [attr.aria-label]="strings.topicName"
+        [placeholder]="strings.topicName"
+        [value]="name()"
+        (input)="onName($event)"
+      />
+      <bac-button
+        type="submit"
+        variant="primary"
+        [label]="
+          naming() === 'new' ? strings.createTopic : strings.saveSettings
+        "
+        [disabled]="!name().trim()"
+      />
+      <bac-button
+        variant="ghost"
+        icon="close"
+        [ariaLabel]="strings.cancelInspector"
+        (buttonClick)="naming.set(null)"
+      />
+    </form>
+  } @else {
+    <div class="mb-3 flex items-center gap-2">
+      <bac-select
+        class="min-w-32 flex-1"
+        [ariaLabel]="strings.topic"
+        [placeholder]="strings.topic"
+        [options]="topicOptions()"
+        [disabled]="session.isBusy()"
+        [value]="research.topicId()"
+        (valueChange)="setTopic($event)"
+      />
+      @if (research.topic()) {
+        <bac-menu
+          [items]="topicActions()"
+          [label]="strings.menu"
+          openDirection="up"
+          (itemSelected)="onTopicAction($event)"
+        >
+          <bac-button
+            menuTrigger
+            variant="icon"
+            icon="menu"
+            [ariaLabel]="strings.menu"
+          />
+        </bac-menu>
+      }
+    </div>
+  }
+}

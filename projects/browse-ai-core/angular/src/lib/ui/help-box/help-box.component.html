@@ -1,0 +1,11 @@
+<div
+  role="note"
+  class="rounded-bac border border-bac-primary bg-bac-accent-soft px-3 py-2 text-xs text-bac-accent-text"
+>
+  <p class="m-0 font-semibold">{{ heading() }}</p>
+  <ul class="mt-1 mb-0 list-disc pl-4">
+    @for (note of notes(); track note) {
+      <li class="leading-relaxed">{{ note }}</li>
+    }
+  </ul>
+</div>

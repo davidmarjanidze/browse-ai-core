@@ -1,0 +1,113 @@
+<span class="bac-thinking-glow" aria-hidden="true"></span>
+@if (ai.isSupported() && !ai.isModelReady() && !ai.isChecking()) {
+  <section class="shrink-0 border-b border-bac-border p-4">
+    <bac-model-download
+      [label]="t().downloadModel"
+      [downloadingLabel]="
+        t().downloadingModel | bacFormat: { percent: ai.downloadProgress() }
+      "
+      [isDownloading]="ai.isDownloading()"
+      [progress]="ai.downloadProgress()"
+      [note]="downloadNote()"
+      [error]="ai.errorMessage()"
+      (download)="ai.downloadModel()"
+    />
+  </section>
+}
+
+<div
+  #scroller
+  part="messages"
+  role="log"
+  aria-live="polite"
+  [attr.aria-busy]="ai.isGenerating()"
+  class="relative min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-3 text-sm sm:p-4"
+>
+  @if (session.messages().length === 0) {
+    <ng-content />
+  }
+
+  @for (message of session.messages(); track message.id) {
+    <div
+      class="flex flex-col gap-2"
+      [class.items-end]="message.sender === 'user'"
+      [attr.data-message-id]="message.id"
+    >
+      @if (message.sender === 'user') {
+        @for (image of message.images ?? []; track $index) {
+          <img
+            [src]="image"
+            [alt]="t().userImage"
+            class="max-h-32 max-w-32 rounded-bac border border-bac-border object-cover"
+          />
+        }
+        @for (audio of message.audios ?? []; track $index) {
+          <audio controls [src]="audio" class="w-full max-w-80"></audio>
+        }
+        @if (message.content.trim()) {
+          <p
+            part="message-user"
+            class="m-0 max-w-[88%] rounded-bac bg-bac-primary px-4 py-2.5 leading-relaxed break-words whitespace-pre-wrap text-bac-on-primary"
+          >
+            {{ message.content }}
+          </p>
+        }
+      } @else {
+        @if (message.error) {
+          <div
+            part="message-error"
+            role="alert"
+            class="max-w-[88%] rounded-bac border border-bac-danger bg-bac-danger-soft px-4 py-2.5 leading-relaxed text-bac-danger"
+          >
+            {{ message.content }}
+          </div>
+        } @else if (!message.content.trim() && message.card) {
+          <!-- The tool card holds the whole answer. -->
+        } @else if (features().markdown) {
+          <div
+            part="message-assistant"
+            class="bac-markdown max-w-[88%] min-w-0 rounded-bac border border-bac-border bg-bac-surface px-4 py-2.5 leading-relaxed break-words text-bac-text"
+            [innerHTML]="message.content | bacMarkdown"
+          ></div>
+        } @else {
+          <p
+            part="message-assistant"
+            class="m-0 max-w-[88%] rounded-bac border border-bac-border bg-bac-surface px-4 py-2.5 leading-relaxed break-words whitespace-pre-wrap text-bac-text"
+          >
+            {{ message.content }}
+          </p>
+        }
+        @if (message.card && !message.error && !message.isStreaming) {
+          <bac-tool-card
+            [message]="message"
+            [live]="message.id === livePerformanceId()"
+          />
+        }
+        @if (!message.error && !message.isStreaming) {
+          <button
+            type="button"
+            class="inline-flex size-7 pointer-coarse:size-11 items-center justify-center rounded-bac text-bac-text-muted transition-colors hover:bg-bac-surface-hover hover:text-bac-text focus-visible:outline-2 focus-visible:outline-bac-primary"
+            [attr.aria-label]="t().copyResponse"
+            [attr.title]="t().copyResponse"
+            (click)="copy(message.content)"
+          >
+            <bac-icon class="size-3.5" name="copy" />
+          </button>
+        }
+      }
+    </div>
+  }
+
+  @if (showSpinner()) {
+    <div
+      role="status"
+      class="flex items-center"
+      [attr.aria-label]="t().generating"
+    >
+      <span
+        aria-hidden="true"
+        class="size-5 animate-spin rounded-full border-2 border-bac-primary border-t-transparent"
+      ></span>
+    </div>
+  }
+</div>

@@ -1,0 +1,97 @@
+<header
+  part="header"
+  class="bac-thinking-surface z-10 flex items-center justify-between gap-2 border-b border-bac-border px-3 py-2.5 sm:px-4"
+  [class.is-thinking]="ai.isThinking()"
+>
+  <span class="bac-thinking-glow" aria-hidden="true"></span>
+  <div class="flex min-w-0 items-center gap-2.5">
+    @if (panel.isSubPanel()) {
+      <bac-button
+        variant="icon"
+        icon="arrow-left"
+        [ariaLabel]="t().backToChat"
+        (buttonClick)="back()"
+      />
+    }
+    <ng-content />
+    <h2 class="truncate text-sm font-bold tracking-wide">{{ title() }}</h2>
+  </div>
+
+  <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
+    @if (!panel.isSubPanel()) {
+      <span
+        class="hidden rounded-full bg-bac-primary px-2.5 py-1 text-[11px] leading-none font-bold text-bac-on-primary min-[360px]:inline"
+      >
+        {{ ai.providerName() }}
+      </span>
+
+      @if (features().contextUsage) {
+        @let percent = ai.contextUsage().percentage;
+        <div
+          role="meter"
+          class="flex size-8 items-center justify-center rounded-full"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="percent"
+          [attr.aria-label]="t().contextUsage | bacFormat: { percent }"
+          [attr.title]="t().contextUsage | bacFormat: { percent }"
+          [style.background]="
+            'conic-gradient(' +
+            usageColor() +
+            ' ' +
+            percent * 3.6 +
+            'deg, var(--bac-surface-hover) 0deg)'
+          "
+        >
+          <span
+            class="flex size-6 items-center justify-center rounded-full bg-bac-bg text-[10px] font-bold"
+            [style.color]="usageColor()"
+          >
+            {{ percent }}
+          </span>
+        </div>
+      }
+
+      <bac-button
+        variant="icon"
+        icon="pen"
+        [ariaLabel]="t().newChat"
+        (buttonClick)="newChat()"
+      />
+
+      @if (menuItems().length) {
+        <bac-menu
+          [items]="menuItems()"
+          [label]="t().menu"
+          openDirection="down"
+          (itemSelected)="onMenu($event)"
+        >
+          <bac-button
+            menuTrigger
+            variant="icon"
+            icon="menu"
+            [ariaLabel]="t().menu"
+          />
+        </bac-menu>
+      }
+    }
+
+    @if (!isInline() || panel.isSubPanel()) {
+      <bac-button
+        variant="icon"
+        icon="close"
+        [ariaLabel]="panel.isSubPanel() ? t().closePanel : t().closeChat"
+        (buttonClick)="panel.isSubPanel() ? panel.open('chat') : panel.close()"
+      />
+    }
+  </div>
+</header>
+
+@if (!ai.isChecking() && !ai.isSupported()) {
+  <p
+    role="alert"
+    class="m-3 rounded-bac border border-bac-warning bg-bac-warning-soft px-3 py-2 text-xs text-bac-warning"
+  >
+    {{ t().notSupported }}
+  </p>
+}

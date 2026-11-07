@@ -1,0 +1,38 @@
+<svg
+  role="img"
+  class="block w-full"
+  preserveAspectRatio="none"
+  [attr.viewBox]="'0 0 ' + width + ' ' + height()"
+  [attr.height]="height()"
+  [attr.aria-label]="ariaLabel()"
+>
+  <line
+    x1="0"
+    [attr.y1]="height() - 0.5"
+    [attr.x2]="width"
+    [attr.y2]="height() - 0.5"
+    stroke="var(--bac-border)"
+  />
+  @if (bars()) {
+    @for (bar of barRects(); track $index) {
+      <rect
+        [attr.x]="bar.x"
+        [attr.y]="bar.y"
+        [attr.width]="bar.w"
+        [attr.height]="bar.h"
+        [attr.fill]="'var(--bac-' + series()[0].color + ')'"
+      />
+    }
+  } @else {
+    @for (line of paths(); track line.label) {
+      <path
+        [attr.d]="line.d"
+        fill="none"
+        stroke-width="2"
+        vector-effect="non-scaling-stroke"
+        stroke-linejoin="round"
+        [attr.stroke]="'var(--bac-' + line.color + ')'"
+      />
+    }
+  }
+</svg>

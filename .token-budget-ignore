@@ -1,0 +1,40 @@
+# Files NOT authored by agents are exempt from the 5,000-token limit.
+# One glob per line. Patterns match the full path or the basename.
+
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Cargo.lock
+poetry.lock
+Gemfile.lock
+composer.lock
+go.sum
+
+# Generated / codegen
+*.generated.*
+*.g.ts
+*.pb.go
+*_pb2.py
+**/__generated__/*
+**/generated/*
+**/dist/*
+**/build/*
+
+# Snapshots, data, minified, binary
+*.snap
+*.min.js
+*.min.css
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+*.woff
+*.woff2
+*.csv
+*.ipynb
+# Package docs: npm shows one README file, so it is not split
+README.md

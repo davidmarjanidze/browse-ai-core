@@ -1,0 +1,16 @@
+<button
+  [type]="type()"
+  [class]="classes[variant()]"
+  [class.w-full]="fullWidth()"
+  [disabled]="disabled()"
+  [attr.aria-label]="ariaLabel() || label()"
+  [attr.title]="ariaLabel() || label()"
+  (click)="onClick($event)"
+>
+  @if (icon(); as iconName) {
+    <bac-icon class="size-3.5" [name]="iconName" />
+  }
+  @if (label()) {
+    <span>{{ label() }}</span>
+  }
+</button>

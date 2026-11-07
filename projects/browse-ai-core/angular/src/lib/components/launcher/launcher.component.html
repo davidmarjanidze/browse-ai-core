@@ -1,0 +1,14 @@
+<button
+  type="button"
+  part="launcher"
+  class="flex size-full items-center justify-center rounded-full bg-bac-primary text-bac-on-primary shadow-xl transition-transform hover:scale-105 hover:bg-bac-primary-hover active:scale-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-bac-primary"
+  [attr.aria-label]="t().openChat"
+  [attr.title]="t().openChat"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="panel.isOpen()"
+  (click)="panel.open('chat')"
+>
+  <span class="flex size-7 items-center justify-center">
+    <ng-content />
+  </span>
+</button>

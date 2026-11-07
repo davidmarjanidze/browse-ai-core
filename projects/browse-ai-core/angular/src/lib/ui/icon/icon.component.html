@@ -1,0 +1,10 @@
+<svg
+  class="block h-full w-full"
+  fill="currentColor"
+  focusable="false"
+  [attr.viewBox]="viewBox()"
+>
+  @for (path of paths(); track $index) {
+    <path [attr.d]="path" />
+  }
+</svg>

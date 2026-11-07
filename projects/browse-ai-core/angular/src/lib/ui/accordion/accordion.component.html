@@ -1,0 +1,39 @@
+<div class="group rounded-bac border border-bac-border bg-bac-bg">
+  <div class="flex items-center">
+    <button
+      type="button"
+      class="flex min-h-10 pointer-coarse:min-h-11 min-w-0 flex-1 items-center justify-between gap-3 px-3 text-left transition-colors hover:bg-bac-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-bac-primary"
+      [attr.aria-expanded]="expanded()"
+      (click)="expanded.set(!expanded())"
+    >
+      <span class="truncate text-sm font-semibold">{{ title() }}</span>
+      <span class="flex items-center gap-2 text-xs text-bac-text-muted">
+        @if (count() !== null) {
+          <span>{{ count() }}</span>
+        }
+        <bac-icon
+          class="size-3 transition-transform"
+          name="chevron-down"
+          [class.rotate-180]="expanded()"
+        />
+      </span>
+    </button>
+    @if (deleteLabel(); as label) {
+      <button
+        type="button"
+        class="mr-1 flex size-8 pointer-coarse:size-11 items-center justify-center rounded-bac text-bac-text-muted transition-colors hover:bg-bac-surface-hover hover:text-bac-danger focus-visible:outline-2 focus-visible:outline-bac-primary"
+        [attr.aria-label]="label"
+        [attr.title]="label"
+        (click)="deleted.emit()"
+      >
+        <bac-icon class="size-3" name="trash" />
+      </button>
+    }
+  </div>
+
+  @if (expanded()) {
+    <div class="border-t border-bac-border p-2">
+      <ng-content />
+    </div>
+  }
+</div>

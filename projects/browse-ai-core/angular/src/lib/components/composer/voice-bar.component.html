@@ -1,0 +1,59 @@
+@let strings = t();
+@if (voice.showHelp() && voice.state() !== 'idle') {
+  <bac-help-box
+    class="mb-3"
+    [heading]="strings.voiceInputHelp"
+    [notes]="strings.voiceInputNotes"
+  />
+}
+@if (voice.state() === 'recording') {
+  <div
+    role="status"
+    class="mb-3 flex items-center gap-3 rounded-bac border border-bac-danger bg-bac-danger-soft px-3 py-2 text-xs text-bac-text"
+  >
+    <span
+      aria-hidden="true"
+      class="size-2.5 shrink-0 animate-pulse rounded-full bg-bac-danger"
+    ></span>
+    <span class="shrink-0 font-semibold tabular-nums">{{
+      recordingLabel()
+    }}</span>
+    <span
+      class="h-1.5 min-w-8 flex-1 overflow-hidden rounded-full bg-bac-surface-hover"
+      role="meter"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-valuenow]="levelPercent()"
+    >
+      <span
+        class="block h-full rounded-full bg-bac-danger transition-[width]"
+        [style.width.%]="levelPercent()"
+      ></span>
+    </span>
+    <span
+      class="shrink-0 cursor-help font-bold text-bac-text-muted"
+      tabindex="0"
+      [attr.title]="strings.voiceInputNotes.join(' ')"
+      [attr.aria-label]="strings.voiceInputHelp"
+      (mouseenter)="voice.showHelp.set(true)"
+      (focus)="voice.showHelp.set(true)"
+      >?</span
+    >
+    <bac-button
+      variant="primary"
+      icon="stop"
+      [label]="strings.stopRecording"
+      (buttonClick)="voice.finish()"
+    />
+    <bac-button
+      variant="ghost"
+      icon="close"
+      [ariaLabel]="strings.cancelRecording"
+      (buttonClick)="voice.cancel()"
+    />
+  </div>
+} @else if (voice.state() === 'transcribing') {
+  <p role="status" class="mb-3 text-xs text-bac-text-muted">
+    {{ strings.transcribing }}
+  </p>
+}

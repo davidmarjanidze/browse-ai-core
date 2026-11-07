@@ -1,0 +1,64 @@
+<div #root class="relative h-full w-full" [class.opacity-50]="disabled()">
+  <button
+    #trigger
+    type="button"
+    class="flex h-full min-h-9 pointer-coarse:min-h-11 w-full items-center justify-between gap-2 rounded-bac border border-bac-border bg-bac-bg px-3 text-sm text-bac-text transition-colors enabled:hover:bg-bac-surface-hover focus-visible:outline-2 focus-visible:outline-bac-primary"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-label]="ariaLabel() || null"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <span class="truncate" [class.text-bac-text-muted]="value() === null">
+      {{ selectedLabel() }}
+    </span>
+    <bac-icon
+      class="size-3 transition-transform"
+      name="chevron-down"
+      [class.rotate-180]="isOpen()"
+    />
+  </button>
+
+  @if (isOpen()) {
+    <div
+      role="listbox"
+      part="listbox"
+      class="bac-pop-in absolute right-0 left-0 z-50 max-h-60 min-w-44 overflow-y-auto rounded-bac border border-bac-border bg-bac-bg py-1 text-bac-text shadow-xl"
+      [class.top-full]="direction() === 'down'"
+      [class.mt-1.5]="direction() === 'down'"
+      [class.bottom-full]="direction() === 'up'"
+      [class.mb-1.5]="direction() === 'up'"
+      [attr.aria-label]="ariaLabel() || null"
+    >
+      @for (group of groups(); track $index) {
+        <div
+          [attr.role]="group.label ? 'group' : null"
+          [attr.aria-label]="group.label"
+        >
+          @if (group.label) {
+            <div
+              aria-hidden="true"
+              class="px-3.5 pt-2 pb-1 text-xs font-bold tracking-wide text-bac-text-muted uppercase"
+            >
+              {{ group.label }}
+            </div>
+          }
+          @for (option of group.options; track $index) {
+            <button
+              type="button"
+              role="option"
+              class="flex min-h-9 pointer-coarse:min-h-11 w-full items-center px-3.5 text-left text-sm transition-colors hover:bg-bac-surface-hover focus-visible:bg-bac-surface-hover focus-visible:outline-none"
+              [class.pl-6]="group.label"
+              [class.bg-bac-accent-soft]="option.value === value()"
+              [class.text-bac-accent-text]="option.value === value()"
+              [attr.aria-selected]="option.value === value()"
+              (click)="choose(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

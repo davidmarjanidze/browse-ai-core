@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - run: npm run build
+      - run: npm run test:element
+      - name: Build the example apps against the packed package
+        run: |
+          (cd dist/browse-ai-core && npm pack --pack-destination ../..)
+          node scripts/examples.mjs ./browse-ai-core-*.tgz ../examples-build

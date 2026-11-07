@@ -1,0 +1,48 @@
+/*
+ * Tailwind CSS v4, compiled into the root component so it lives inside the
+ * shadow root. Colors come from the --bac-* variables set by the palette.
+ */
+@import 'tailwindcss/theme' theme(inline);
+@import 'tailwindcss/preflight';
+@import 'tailwindcss/utilities' source(none);
+
+@source '../**/*.html';
+@source '../**/*.ts';
+
+@theme inline {
+  --color-bac-bg: var(--bac-bg);
+  --color-bac-surface: var(--bac-surface);
+  --color-bac-surface-hover: var(--bac-surface-hover);
+  --color-bac-border: var(--bac-border);
+  --color-bac-text: var(--bac-text);
+  --color-bac-text-muted: var(--bac-text-muted);
+  --color-bac-primary: var(--bac-primary);
+  --color-bac-primary-hover: var(--bac-primary-hover);
+  --color-bac-on-primary: var(--bac-on-primary);
+  --color-bac-accent-soft: var(--bac-accent-soft);
+  --color-bac-accent-text: var(--bac-accent-text);
+  --color-bac-success: var(--bac-success);
+  --color-bac-success-soft: var(--bac-success-soft);
+  --color-bac-warning: var(--bac-warning);
+  --color-bac-warning-soft: var(--bac-warning-soft);
+  --color-bac-danger: var(--bac-danger);
+  --color-bac-danger-soft: var(--bac-danger-soft);
+  --radius-bac: var(--bac-radius);
+}
+
+/*
+ * Tailwind v4 preflight no longer gives buttons a pointer cursor. :where()
+ * keeps this at zero specificity, so cursor-* utilities still win.
+ */
+:where(
+  button:not(:disabled),
+  select:not(:disabled),
+  summary,
+  [role='button']:not([aria-disabled='true']),
+  [role='option']:not([aria-disabled='true']),
+  [role='menuitem'],
+  [role='switch'],
+  [role='radio']
+) {
+  cursor: pointer;
+}

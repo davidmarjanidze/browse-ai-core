@@ -1,0 +1,20 @@
+<button
+  type="button"
+  role="switch"
+  class="relative inline-flex h-6 w-10 shrink-0 items-center rounded-full border p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bac-primary disabled:opacity-50"
+  [class.border-bac-primary]="checked()"
+  [class.bg-bac-primary]="checked()"
+  [class.border-bac-border]="!checked()"
+  [class.bg-bac-surface-hover]="!checked()"
+  [attr.aria-checked]="checked()"
+  [attr.aria-label]="ariaLabel() || null"
+  [disabled]="disabled()"
+  (click)="toggle()"
+>
+  <span
+    class="flex size-5 items-center justify-center rounded-full bg-bac-bg text-bac-text transition-transform"
+    [class.translate-x-4]="checked()"
+  >
+    <bac-icon class="size-2.5" [name]="checked() ? 'check' : 'minus'" />
+  </span>
+</button>

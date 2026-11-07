@@ -1,0 +1,22 @@
+name: cost-guardrails
+
+# Re-runs the pre-commit checks on every PR, because `git commit --no-verify`
+# skips them locally.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Token budget (all tracked files)
+        run: bash claude/scripts/check-file-tokens.sh --all
+      - name: CLAUDE.md size
+        run: bash claude/scripts/check-claude-md-size.sh
+      - name: Hook smoke tests
+        run: |
+          chmod +x .claude/hooks/*.sh .claude/statusline.sh
+          bash claude/scripts/test-hooks.sh

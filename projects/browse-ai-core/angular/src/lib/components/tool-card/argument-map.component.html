@@ -1,0 +1,51 @@
+@let strings = t();
+<div class="grid gap-3" [class.@xl:grid-cols-2]="groups().length === 2">
+  @for (group of groups(); track group.type) {
+    <section
+      class="min-w-0 rounded-bac border-l-4 bg-bac-surface p-2"
+      [class.border-bac-success]="group.type === 'support'"
+      [class.border-bac-warning]="group.type === 'counter'"
+    >
+      <h4 class="m-0 mb-2 text-xs font-bold">{{ group.title }}</h4>
+      <ul class="m-0 space-y-2 pl-0">
+        @for (point of group.points; track $index) {
+          <li class="list-none">
+            <p class="m-0">{{ point.text }}</p>
+            <span
+              class="mr-2 inline-block rounded-full border border-bac-border px-1.5 text-[10px] text-bac-text-muted"
+              >{{ evidence(point.evidence) }}</span
+            >
+            @if (findable().has(point.quote)) {
+              <button
+                type="button"
+                class="bac-card-link"
+                (click)="service.reveal(point.quote)"
+              >
+                {{ strings.showOnPage }}
+              </button>
+            }
+            @if (point.points.length) {
+              <ul class="mt-1 space-y-1 border-l border-bac-border pl-3">
+                @for (child of point.points; track $index) {
+                  <li class="list-none text-xs">
+                    {{ child.text }}
+                    <span class="text-bac-text-muted"
+                      >({{ evidence(child.evidence) }})</span
+                    >
+                  </li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>
+<bac-button
+  class="mt-3"
+  variant="secondary"
+  icon="copy"
+  [label]="strings.copyMarkdown"
+  (buttonClick)="copyMarkdown()"
+/>

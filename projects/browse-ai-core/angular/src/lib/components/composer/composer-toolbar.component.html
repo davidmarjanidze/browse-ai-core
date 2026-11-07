@@ -1,0 +1,91 @@
+@if (session.features().pageContext || session.tools().length) {
+  <div class="mb-3 flex flex-wrap items-center gap-2">
+    @if (session.features().pageContext) {
+      <bac-toggle-group
+        class="max-w-full"
+        [ariaLabel]="t().contextModeLabel"
+        [options]="contextOptions()"
+        [disabled]="isBusy()"
+        [(value)]="session.contextMode"
+      />
+    }
+
+    @if (session.tools().length) {
+      <bac-select
+        class="min-w-32 flex-1"
+        [ariaLabel]="t().tools"
+        [placeholder]="t().tools"
+        [options]="toolOptions()"
+        [disabled]="isBusy()"
+        [value]="session.selectedTool()"
+        (valueChange)="session.selectTool($event)"
+      />
+    }
+
+    @if (session.selectedTool() === 'dom-to-component') {
+      <bac-select
+        class="min-w-32 flex-1"
+        [ariaLabel]="t().framework"
+        [options]="frameworkOptions"
+        [disabled]="isBusy()"
+        [value]="session.domFramework()"
+        (valueChange)="setFramework($event)"
+      />
+    }
+
+    @if (session.selectedTool() === 'translator') {
+      <bac-select
+        class="min-w-32 flex-1"
+        [ariaLabel]="t().translateTo"
+        [placeholder]="t().translateTo"
+        [options]="languageOptions()"
+        [disabled]="isBusy()"
+        [value]="session.builtIn.targetLanguage()"
+        (valueChange)="setTargetLanguage($event)"
+      />
+    }
+  </div>
+}
+
+@if (session.selectedToolInfo(); as tool) {
+  <div
+    role="note"
+    class="mb-3 rounded-bac border border-bac-primary bg-bac-accent-soft px-3 py-2 text-xs text-bac-accent-text"
+  >
+    <p class="m-0 font-semibold">
+      {{ t().howToUse | bacFormat: { tool: tool.name } }}
+    </p>
+    <ul class="mt-1 mb-0 list-disc pl-4">
+      @for (note of tool.notes; track note) {
+        <li class="leading-relaxed">{{ note }}</li>
+      }
+    </ul>
+  </div>
+}
+
+@if (session.isInspecting() || session.domSelection()) {
+  <div
+    role="status"
+    class="mb-3 flex items-center justify-between gap-2 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"
+  >
+    <div class="min-w-0 truncate">
+      <span class="font-semibold">{{ t().domElement }}</span>
+      <span class="ml-1">
+        {{
+          session.domSelection()?.elementLabel ||
+            session.hoveredElementLabel() ||
+            t().inspectorHover
+        }}
+      </span>
+    </div>
+    <button
+      type="button"
+      class="flex size-7 pointer-coarse:size-11 shrink-0 items-center justify-center rounded-bac border border-bac-border bg-bac-bg hover:bg-bac-surface-hover focus-visible:outline-2 focus-visible:outline-bac-primary"
+      [attr.aria-label]="t().cancelInspector"
+      [attr.title]="t().cancelInspector"
+      (click)="session.selectTool(null)"
+    >
+      <bac-icon class="size-3" name="close" />
+    </button>
+  </div>
+}

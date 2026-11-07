@@ -1,0 +1,151 @@
+/* Sizes and position. Override the variables on the <browse-ai-core> element. */
+:host {
+  --bac-font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bac-radius: 0.5rem;
+  --bac-offset: 16px;
+  --bac-panel-width: 400px;
+  --bac-panel-height: 640px;
+  --bac-launcher-size: 56px;
+  --bac-launcher-opacity: 0.5;
+  --bac-z-index: 2147483000;
+
+  display: contents;
+  font-family: var(--bac-font-family);
+  color: var(--bac-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+:host([data-layout='inline']) {
+  display: block;
+  height: 100%;
+}
+
+.bac-launcher,
+.bac-panel {
+  position: fixed;
+  z-index: var(--bac-z-index);
+}
+
+.bac-launcher {
+  width: var(--bac-launcher-size);
+  height: var(--bac-launcher-size);
+  /* See-through until the user points at it, so it doesn't cover the page. */
+  opacity: var(--bac-launcher-opacity);
+  transition: opacity 200ms ease;
+}
+
+.bac-launcher:hover,
+.bac-launcher:focus-within {
+  opacity: 1;
+}
+
+[data-position$='right'] :is(.bac-launcher, .bac-panel) {
+  right: max(var(--bac-offset), env(safe-area-inset-right));
+}
+[data-position$='left'] :is(.bac-launcher, .bac-panel) {
+  left: max(var(--bac-offset), env(safe-area-inset-left));
+}
+[data-position^='bottom'] :is(.bac-launcher, .bac-panel) {
+  bottom: max(var(--bac-offset), env(safe-area-inset-bottom));
+}
+[data-position^='top'] :is(.bac-launcher, .bac-panel) {
+  top: max(var(--bac-offset), env(safe-area-inset-top));
+}
+
+.bac-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--bac-border);
+  background: var(--bac-bg);
+  color: var(--bac-text);
+  box-shadow: 0 24px 48px -12px rgb(0 0 0 / 0.35);
+}
+
+[data-layout='floating'] .bac-panel {
+  width: min(var(--bac-panel-width), calc(100vw - 2 * var(--bac-offset)));
+  height: min(var(--bac-panel-height), calc(100dvh - 2 * var(--bac-offset)));
+  border-radius: calc(var(--bac-radius) * 2);
+}
+
+[data-layout='drawer'] .bac-panel {
+  top: 0;
+  bottom: 0;
+  width: min(var(--bac-panel-width), 100vw);
+  border-width: 0;
+  border-radius: 0;
+}
+[data-layout='drawer'][data-position$='right'] .bac-panel {
+  right: 0;
+  border-left-width: 1px;
+}
+[data-layout='drawer'][data-position$='left'] .bac-panel {
+  left: 0;
+  border-right-width: 1px;
+}
+
+[data-layout='inline'] .bac-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  border-radius: calc(var(--bac-radius) * 2);
+  box-shadow: none;
+  z-index: auto;
+}
+
+/* Phones: the panel covers the screen. */
+@media (max-width: 639.98px) {
+  [data-layout='floating'] .bac-panel,
+  [data-layout='drawer'] .bac-panel {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--bac-text-muted) 40%, transparent);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--bac-text-muted) 40%, transparent)
+    transparent;
+}
+
+/* Small text buttons in tool cards ("Show on page", "Uncheck"). */
+.bac-card-link {
+  min-height: 1.5rem;
+  padding: 0 0.25rem;
+  border: 0;
+  border-radius: var(--bac-radius);
+  background: transparent;
+  color: var(--bac-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bac-card-link:hover {
+  text-decoration: underline;
+}
+
+.bac-card-link:focus-visible {
+  outline: 2px solid var(--bac-primary);
+}
+
+@media (pointer: coarse) {
+  .bac-card-link {
+    min-height: 2.75rem;
+  }
+}

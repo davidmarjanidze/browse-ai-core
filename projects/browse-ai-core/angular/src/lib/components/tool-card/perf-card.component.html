@@ -1,0 +1,141 @@
+@let strings = t();
+<ul class="m-0 grid grid-cols-2 gap-2 p-0 @md:grid-cols-3">
+  @for (tile of tiles(); track tile.id) {
+    <li class="list-none">
+      <button
+        type="button"
+        class="w-full rounded-bac border bg-bac-surface p-2 text-left disabled:cursor-default"
+        [class.border-bac-success]="tile.rating === 'good'"
+        [class.border-bac-warning]="tile.rating === 'needs-work'"
+        [class.border-bac-danger]="tile.rating === 'poor'"
+        [class.border-bac-border]="!tile.rating"
+        [disabled]="tile.id !== 'lcp' || !collector.lcpElement"
+        (click)="explainer.revealLcp()"
+      >
+        <span class="block text-[11px] font-bold text-bac-text-muted">{{
+          tile.name
+        }}</span>
+        <span class="block text-sm font-bold tabular-nums">{{
+          tile.value
+        }}</span>
+        @if (tile.rating) {
+          <span
+            class="block text-[11px] font-semibold"
+            [class.text-bac-success]="tile.rating === 'good'"
+            [class.text-bac-warning]="tile.rating === 'needs-work'"
+            [class.text-bac-danger]="tile.rating === 'poor'"
+            >{{ tile.ratingLabel }}</span
+          >
+        }
+      </button>
+    </li>
+  }
+</ul>
+
+@for (chart of charts(); track chart.title) {
+  <figure class="m-0 mt-3">
+    <figcaption class="mb-1 flex flex-wrap gap-x-3 text-xs font-semibold">
+      @for (line of chart.series; track line.label) {
+        <span class="inline-flex items-center gap-1">
+          <span
+            aria-hidden="true"
+            class="inline-block h-1 w-3 rounded"
+            [style.background]="'var(--bac-' + line.color + ')'"
+          ></span>
+          {{ line.label }}
+        </span>
+      }
+    </figcaption>
+    @if (asTable()) {
+      <div class="max-h-40 overflow-y-auto">
+        <table class="w-full text-xs tabular-nums">
+          <thead>
+            <tr>
+              <th class="text-left">{{ strings.seconds }}</th>
+              @for (line of chart.series; track line.label) {
+                <th class="text-right">{{ line.label }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (
+              row of rows(chart.series[0].values);
+              track row.second;
+              let i = $index
+            ) {
+              <tr>
+                <td>{{ row.second }}</td>
+                @for (line of chart.series; track line.label) {
+                  <td class="text-right">{{ rows(line.values)[i]?.value }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <bac-line-chart
+        [series]="chart.series"
+        [slots]="slots"
+        [bars]="chart.bars ?? false"
+        [ariaLabel]="chart.label"
+      />
+    }
+  </figure>
+}
+
+@if (files().length) {
+  <figure class="m-0 mt-3">
+    <figcaption class="mb-1 text-xs font-semibold">
+      {{ strings.largestFiles }}
+    </figcaption>
+    <ul class="m-0 space-y-1 p-0">
+      @for (file of files(); track file.url) {
+        <li class="list-none text-xs" [title]="file.url">
+          <span class="flex justify-between gap-2">
+            <span class="min-w-0 truncate"
+              >{{ file.name }}
+              <span class="text-bac-text-muted">({{ file.type }})</span></span
+            >
+            <span class="shrink-0 tabular-nums">{{ file.sizeKb }} KB</span>
+          </span>
+          <span
+            class="block h-1.5 overflow-hidden rounded-full bg-bac-surface-hover"
+            aria-hidden="true"
+          >
+            <span
+              class="block h-full rounded-full bg-bac-primary"
+              [style.width.%]="file.percent"
+            ></span>
+          </span>
+        </li>
+      }
+    </ul>
+  </figure>
+}
+
+<div class="mt-3 flex flex-wrap gap-2">
+  @if (live()) {
+    <bac-button
+      variant="secondary"
+      [label]="collector.paused() ? strings.resume : strings.pause"
+      (buttonClick)="togglePause()"
+    />
+    <bac-button
+      variant="secondary"
+      [label]="strings.reset"
+      (buttonClick)="reset()"
+    />
+  }
+  <bac-button
+    variant="secondary"
+    [label]="asTable() ? strings.showAsChart : strings.showAsTable"
+    (buttonClick)="asTable.set(!asTable())"
+  />
+  <bac-button
+    variant="secondary"
+    [label]="strings.explainAgain"
+    [disabled]="session.isBusy()"
+    (buttonClick)="explainAgain()"
+  />
+</div>

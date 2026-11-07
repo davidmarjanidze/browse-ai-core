@@ -1,0 +1,18 @@
+@for (toast of toasts(); track toast.id) {
+  <div
+    part="toast"
+    role="status"
+    class="bac-pop-in pointer-events-auto max-w-full rounded-bac border px-3 py-2 text-sm shadow-lg"
+    [class.border-bac-border]="toast.variant === 'default'"
+    [class.bg-bac-bg]="toast.variant === 'default'"
+    [class.text-bac-text]="toast.variant === 'default'"
+    [class.border-bac-success]="toast.variant === 'success'"
+    [class.bg-bac-success-soft]="toast.variant === 'success'"
+    [class.text-bac-success]="toast.variant === 'success'"
+    [class.border-bac-danger]="toast.variant === 'error'"
+    [class.bg-bac-danger-soft]="toast.variant === 'error'"
+    [class.text-bac-danger]="toast.variant === 'error'"
+  >
+    {{ toast.message }}
+  </div>
+}

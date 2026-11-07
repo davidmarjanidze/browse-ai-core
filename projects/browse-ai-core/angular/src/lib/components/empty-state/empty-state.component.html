@@ -1,0 +1,14 @@
+@let t = session.strings();
+<div
+  class="flex size-12 items-center justify-center rounded-bac border border-bac-border bg-bac-surface text-bac-primary"
+>
+  <bac-icon class="size-6" name="comments" />
+</div>
+<div>
+  <h3 class="text-base font-bold">
+    {{ session.usesPageContext() ? t.emptyPageTitle : t.emptyGeneralTitle }}
+  </h3>
+  <p class="mt-1 text-xs text-bac-text-muted">
+    {{ session.usesPageContext() ? t.emptyPageText : t.emptyGeneralText }}
+  </p>
+</div>
