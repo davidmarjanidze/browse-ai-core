@@ -6,11 +6,15 @@ export interface DomElementSelection {
   tagName: string
   elementLabel: string
   outerHtml: string
+  /** The picked element (Watch Mode keeps watching it). */
+  element?: HTMLElement
 }
 
 export interface InspectionCallbacks {
   onSelected: (selection: DomElementSelection) => void
   onCanceled?: () => void
+  /** Elements that can't be picked (for example password fields). */
+  accept?: (element: HTMLElement) => boolean
 }
 
 /** `div#main.card.wide` style label for an element. */
@@ -24,7 +28,11 @@ export function describeElement(element: Element): string {
   return `${element.tagName.toLowerCase()}${id}${classes}`
 }
 
-/** Hover-to-highlight, click-to-select picker for page elements. */
+/**
+ * Hover-to-highlight, click-to-select picker for page elements, like the one
+ * in Chrome DevTools. Arrow Up and Arrow Down move to the parent or child.
+ * Used by DOM Element to Component and Watch Mode.
+ */
 @Injectable()
 export class DomInspectorService {
   readonly #document = inject(DOCUMENT)
@@ -37,6 +45,8 @@ export class DomInspectorService {
   #label: HTMLDivElement | null = null
   #callbacks: InspectionCallbacks | null = null
   #previousCursor = ''
+  /** The selection was moved with the arrow keys. */
+  #moved = false
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.stop())
@@ -76,6 +86,7 @@ export class DomInspectorService {
     this.#box?.remove()
     this.#label?.remove()
     this.#box = this.#label = this.#hovered = this.#callbacks = null
+    this.#moved = false
     this.hoveredLabel.set('')
     this.isInspecting.set(false)
   }
@@ -93,8 +104,17 @@ export class DomInspectorService {
       target !== this.#host &&
       !this.#host.contains(target) &&
       target !== this.#box &&
-      target !== this.#label
+      target !== this.#label &&
+      target !== this.#document.body &&
+      target !== this.#document.documentElement &&
+      (this.#callbacks?.accept?.(target) ?? true)
     )
+  }
+
+  #hover(target: HTMLElement): void {
+    this.#hovered = target
+    this.hoveredLabel.set(describeElement(target))
+    this.#draw(target)
   }
 
   #draw(target: HTMLElement): void {
@@ -131,9 +151,13 @@ export class DomInspectorService {
       this.#hide()
       return
     }
-    this.#hovered = target
-    this.hoveredLabel.set(describeElement(target))
-    this.#draw(target)
+    // Keep a parent or child picked with the arrow keys while the pointer stays inside it.
+    const hovered = this.#hovered
+    if (hovered && (hovered.contains(target) || target.contains(hovered))) {
+      if (this.#moved) return
+    }
+    this.#moved = false
+    this.#hover(target)
   }
 
   readonly #onScroll = (): void => {
@@ -141,8 +165,13 @@ export class DomInspectorService {
   }
 
   readonly #onClick = (event: MouseEvent): void => {
-    const target = event.composedPath()[0] ?? event.target
-    if (!this.#isPageElement(target)) return
+    const clicked = event.composedPath()[0] ?? event.target
+    if (!this.#isPageElement(clicked)) return
+    const hovered = this.#hovered
+    const target =
+      hovered && (hovered.contains(clicked) || clicked.contains(hovered))
+        ? hovered
+        : clicked
 
     event.preventDefault()
     event.stopImmediatePropagation()
@@ -151,11 +180,33 @@ export class DomInspectorService {
     callbacks?.onSelected({
       tagName: target.tagName.toLowerCase(),
       elementLabel: describeElement(target),
-      outerHtml: target.outerHTML
+      outerHtml: target.outerHTML,
+      element: target
     })
   }
 
+  /** Moves the selection to the parent (Up) or first child (Down). */
+  #step(event: KeyboardEvent): void {
+    const current = this.#hovered
+    if (!current) return
+    const next =
+      event.key === 'ArrowUp'
+        ? current.parentElement
+        : ([...current.children].find(
+            (child) => child instanceof HTMLElement
+          ) as HTMLElement | undefined)
+    if (!next || !this.#isPageElement(next)) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    this.#moved = true
+    this.#hover(next)
+  }
+
   readonly #onKey = (event: KeyboardEvent): void => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      this.#step(event)
+      return
+    }
     if (event.key !== 'Escape') return
     event.preventDefault()
     event.stopImmediatePropagation()

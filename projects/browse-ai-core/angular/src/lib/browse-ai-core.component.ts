@@ -111,6 +111,9 @@ export class BrowseAiCoreComponent {
     this.#events.responseReceived
   )
   readonly errorOccurred = outputFromObservable(this.#events.errorOccurred)
+  readonly agentStep = outputFromObservable(this.#events.agentStep)
+  readonly agentFinished = outputFromObservable(this.#events.agentFinished)
+  readonly watchMatched = outputFromObservable(this.#events.watchMatched)
   readonly themeChange = outputFromObservable(
     toObservable(
       computed<ThemeChangeEvent>(() => ({

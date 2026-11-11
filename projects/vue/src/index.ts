@@ -9,6 +9,8 @@ import {
 } from 'vue'
 import 'browse-ai-core/element'
 import type {
+  AgentFinishedEvent,
+  AgentStepEvent,
   BrowseAiCoreConfig,
   BrowseAiCoreElement,
   ChatMode,
@@ -17,7 +19,8 @@ import type {
   PaletteName,
   ResponseReceivedEvent,
   ThemeChangeEvent,
-  ThemeMode
+  ThemeMode,
+  WatchMatchedEvent
 } from 'browse-ai-core'
 
 const EVENTS = {
@@ -27,7 +30,10 @@ const EVENTS = {
   messageSent: 'messageSent',
   responseReceived: 'responseReceived',
   errorOccurred: 'error',
-  themeChange: 'themeChange'
+  themeChange: 'themeChange',
+  agentStep: 'agentStep',
+  agentFinished: 'agentFinished',
+  watchMatched: 'watchMatched'
 } as const
 
 /** The chat assistant as a Vue 3 component. Supports `v-model:open`. */
@@ -51,7 +57,10 @@ export const BrowseAiCore = defineComponent({
     messageSent: (_event: MessageSentEvent) => true,
     responseReceived: (_event: ResponseReceivedEvent) => true,
     error: (_error: Error) => true,
-    themeChange: (_event: ThemeChangeEvent) => true
+    themeChange: (_event: ThemeChangeEvent) => true,
+    agentStep: (_event: AgentStepEvent) => true,
+    agentFinished: (_event: AgentFinishedEvent) => true,
+    watchMatched: (_event: WatchMatchedEvent) => true
   },
   setup(props, { emit, slots, expose }) {
     const element = shallowRef<BrowseAiCoreElement | null>(null)

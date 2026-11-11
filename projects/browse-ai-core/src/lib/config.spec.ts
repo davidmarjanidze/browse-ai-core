@@ -84,3 +84,32 @@ describe('defaultContextMode', () => {
     ).toBe('page')
   })
 })
+
+describe('agent and watch options', () => {
+  it('uses defaults and keeps both modes off', () => {
+    const config = resolveConfig()
+    expect(config.features.agentMode).toBe(false)
+    expect(config.features.watchMode).toBe(false)
+    expect(config.agent).toEqual({
+      maxSteps: 25,
+      maxDurationMs: 300_000,
+      confirm: 'risky'
+    })
+    expect(config.watch).toEqual({ intervalMs: 15_000, threshold: 0.7 })
+  })
+
+  it('merges options and rejects bad values', () => {
+    const config = resolveConfig(
+      { agent: { maxSteps: 10 }, watch: { threshold: 0.9 } },
+      {
+        agent: { confirm: 'sometimes' as 'risky' },
+        watch: { intervalMs: 1000, threshold: undefined }
+      }
+    )
+    expect(config.agent.maxSteps).toBe(10)
+    expect(config.agent.confirm).toBe('risky')
+    expect(config.watch.intervalMs).toBe(5_000)
+    expect(config.watch.threshold).toBe(0.9)
+    expect(resolveConfig({ watch: { threshold: 3 } }).watch.threshold).toBe(0.7)
+  })
+})

@@ -1,3 +1,4 @@
+import { TOOL_STRINGS_AGENTS } from './strings-tools-agents'
 import { TOOL_STRINGS_PAGE } from './strings-tools-page'
 
 /**
@@ -6,6 +7,7 @@ import { TOOL_STRINGS_PAGE } from './strings-tools-page'
  */
 export const TOOL_STRINGS = {
   toolGroupForms: 'Forms',
+  toolGroupAgents: 'Agents',
   toolGroupRead: 'Read & understand',
   toolGroupWrite: 'Write',
   toolGroupSave: 'Save & extract',
@@ -157,5 +159,6 @@ export const TOOL_STRINGS = {
   evidenceNone: 'No evidence',
   noArgumentFound: 'No clear argument was found in this text.',
 
-  ...TOOL_STRINGS_PAGE
+  ...TOOL_STRINGS_PAGE,
+  ...TOOL_STRINGS_AGENTS
 }

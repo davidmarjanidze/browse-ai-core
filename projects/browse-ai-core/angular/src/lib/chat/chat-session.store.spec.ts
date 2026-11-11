@@ -187,4 +187,53 @@ describe('ChatSessionStore', () => {
       'dom-to-component'
     ])
   })
+
+  it('needs a picked element and an instruction to start Watch Mode', async () => {
+    const { session } = await setup({}, { features: { watchMode: true } })
+    document.body.innerHTML = '<span id="p">Price 10</span>'
+    session.selectTool('watch-mode')
+    session.prompt.set('below 5')
+    expect(session.canSend()).toBe(false)
+    session.watch.picked.set({
+      element: document.getElementById('p')!,
+      label: 'span#p',
+      preview: 'Price 10',
+      tooLong: false
+    })
+    expect(session.canSend()).toBe(true)
+    session.prompt.set(' ')
+    expect(session.canSend()).toBe(false)
+    session.prompt.set('below 5')
+    await session.send()
+    expect(session.watch.status()?.label).toBe('span#p')
+    expect(session.messages()[0].content).toBe('Watch Mode: span#p\nbelow 5')
+    session.clear()
+    expect(session.watch.status()).toBeNull()
+  })
+
+  it('sends the next message to Agent Mode when it asks a question', async () => {
+    let calls = 0
+    const { session } = await setup(
+      {
+        reply: () =>
+          ++calls === 1
+            ? '{"tool":"ask_user","args":{"question":"Which one?"}}'
+            : '{"tool":"done","args":{"summary":"Finished."}}'
+      },
+      { features: { agentMode: true } }
+    )
+    session.selectTool('agent-mode')
+    session.prompt.set('Do it')
+    const running = session.send()
+    await vi.waitFor(() => expect(session.agent.question()).toBe('Which one?'))
+    expect(session.inputLocked()).toBe(false)
+    session.prompt.set('The first')
+    expect(session.canSend()).toBe(true)
+    await session.send()
+    await running
+    const contents = session.messages().map((m) => m.content)
+    expect(contents[1]).toContain('Which one?')
+    expect(contents[2]).toBe('The first')
+    expect(contents[3]).toContain('Finished.')
+  })
 })

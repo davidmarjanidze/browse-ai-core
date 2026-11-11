@@ -35,6 +35,11 @@ export interface AiSessionOptions {
 
 export interface AiRequestOptions {
   signal?: AbortSignal
+  /**
+   * JSON schema the answer must follow. Chrome's Prompt API supports it;
+   * providers that don't can ignore it.
+   */
+  responseConstraint?: object
 }
 
 export interface AiSession {

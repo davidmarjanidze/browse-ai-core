@@ -20,11 +20,14 @@ async function setup(config = {}) {
   return session
 }
 
+/** Agent Mode and Watch Mode are off by default. */
+const ALL_ON = { features: { agentMode: true, watchMode: true } }
+
 describe('newer tools', () => {
   afterEach(() => (document.body.innerHTML = ''))
 
   it('are listed when on and hidden when off', async () => {
-    const session = await setup()
+    const session = await setup(ALL_ON)
     const ids = session.tools().map((tool) => tool.id)
     for (const tool of EXTRA_TOOLS) expect(ids).toContain(tool.id)
     TestBed.resetTestingModule()
@@ -37,7 +40,7 @@ describe('newer tools', () => {
   })
 
   it('each show the green help box with their steps', async () => {
-    const session = await setup()
+    const session = await setup(ALL_ON)
     const fixture = TestBed.createComponent(ComposerToolbarComponent)
     for (const tool of EXTRA_TOOLS) {
       session.selectTool(tool.id)

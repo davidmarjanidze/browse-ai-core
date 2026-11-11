@@ -1,4 +1,6 @@
 import { Injectable, inject } from '@angular/core'
+import { AgentRunnerService } from '../tools/agent/agent-runner.service'
+import { WatchRunnerService } from '../tools/watch/watch-runner.service'
 import { ArgumentMapperService } from '../tools/argument-mapper/argument-mapper.service'
 import { DarkPatternDetectorService } from '../tools/dark-patterns/dark-pattern-detector.service'
 import { DictationService } from '../tools/dictation/dictation.service'
@@ -13,7 +15,7 @@ import { ResearchService } from '../tools/research/research.service'
 import { ReviewSummarizerService } from '../tools/review-summarizer/review-summarizer.service'
 import type { ToolRequest, ToolResult } from './tool-runner'
 
-/** Runs the tools from specs T-002 to T-012. */
+/** Runs the newer tools (each with its own service). */
 @Injectable()
 export class ExtraToolRunner {
   readonly links = inject(LinkInspectorService)
@@ -27,6 +29,8 @@ export class ExtraToolRunner {
   readonly performance = inject(PerformanceExplainerService)
   readonly phishing = inject(PhishingCheckService)
   readonly darkPatterns = inject(DarkPatternDetectorService)
+  readonly agent = inject(AgentRunnerService)
+  readonly watch = inject(WatchRunnerService)
 
   run(tool: ExtraToolId, request: ToolRequest): Promise<ToolResult> {
     const services: Record<
@@ -43,7 +47,9 @@ export class ExtraToolRunner {
       dictation: this.dictation,
       'performance-explainer': this.performance,
       'phishing-check': this.phishing,
-      'dark-pattern-detector': this.darkPatterns
+      'dark-pattern-detector': this.darkPatterns,
+      'agent-mode': this.agent,
+      'watch-mode': this.watch
     }
     return services[tool].run(request)
   }
@@ -53,5 +59,8 @@ export class ExtraToolRunner {
     this.form.clear()
     this.darkPatterns.clear()
     this.reply.reset()
+    this.agent.reset()
+    this.watch.stop(false)
+    this.watch.clearPick()
   }
 }

@@ -35,10 +35,15 @@ import {
   StreamState,
   appendChunk,
   completeAnswer,
+  createAssistantMessage,
   createUserMessage,
   failAnswer
 } from './chat-messages'
 import { ToolRunner } from './tool-runner'
+import { ToolNotices } from './tool-notices'
+import { AgentRunnerService } from '../tools/agent/agent-runner.service'
+import { WatchRunnerService } from '../tools/watch/watch-runner.service'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 
 export type ScrollRequest =
   { target: 'bottom' } | { target: 'message'; id: string }
@@ -55,6 +60,8 @@ export class ChatSessionStore {
   readonly #tools = inject(ToolRunner)
   readonly #toast = inject(ToastService)
   readonly #events = inject(ChatEvents)
+  readonly agent = inject(AgentRunnerService)
+  readonly watch = inject(WatchRunnerService)
 
   readonly messages = signal<ChatMessage[]>([])
   readonly prompt = signal('')
@@ -116,8 +123,13 @@ export class ChatSessionStore {
     this.builtIn.states()
     return this.builtIn.isReady(tool) ? null : tool
   })
+  /** The composer is locked, except to answer Agent Mode's question. */
+  readonly inputLocked = computed(
+    () => this.isBusy() && this.agent.question() === null
+  )
   readonly canSend = computed(() => {
     const tool = this.selectedTool()
+    if (this.agent.question() !== null) return Boolean(this.prompt().trim())
     if (this.isBusy()) return false
     if (isBuiltInTool(tool)) {
       return this.builtIn.isReady(tool) && Boolean(this.prompt().trim())
@@ -126,6 +138,8 @@ export class ChatSessionStore {
     if (this.selectedTool() === 'dom-to-component')
       return this.domSelection() !== null
     if (this.selectedTool() === 'dictation') return Boolean(this.audio())
+    if (tool === 'watch-mode')
+      return this.watch.picked() !== null && Boolean(this.prompt().trim())
     return Boolean(
       this.prompt().trim() ||
       this.image() ||
@@ -145,6 +159,15 @@ export class ChatSessionStore {
         inspect ? this.#startInspector() : this.#inspector.stop()
       )
     })
+    inject(ToolNotices)
+      .posted.pipe(takeUntilDestroyed())
+      .subscribe(({ text, error }) => {
+        this.messages.update((messages) => [
+          ...messages,
+          createAssistantMessage(text, { error })
+        ])
+        this.scrollRequest.set({ target: 'bottom' })
+      })
     inject(DestroyRef).onDestroy(() => {
       this.#abort?.abort()
       this.#inspector.stop()
@@ -182,6 +205,7 @@ export class ChatSessionStore {
 
   selectTool(tool: ToolId | null): void {
     this.domSelection.set(null)
+    if (tool !== 'watch-mode') this.watch.clearPick()
     this.selectedTool.set(tool)
   }
 
@@ -225,15 +249,25 @@ export class ChatSessionStore {
     if (!this.canSend()) return
 
     const text = this.prompt().trim()
+    if (this.agent.question() !== null) {
+      this.messages.update((messages) => [...messages, createUserMessage(text)])
+      this.scrollRequest.set({ target: 'bottom' })
+      this.prompt.set('')
+      this.agent.answer(text)
+      return
+    }
     const image = this.image() ?? undefined
     const audio = this.audio() ?? undefined
     const tool = this.selectedTool()
     const selection = this.domSelection()
     const strings = this.strings()
 
-    const shown = selection
-      ? `${strings.domToComponentName}: <${selection.tagName}> (${this.domFramework()})${text ? `\n${text}` : ''}`
-      : text
+    const watched = tool === 'watch-mode' ? this.watch.picked() : null
+    const shown = watched
+      ? `${strings.watchModeName}: ${watched.label}\n${text}`
+      : selection
+        ? `${strings.domToComponentName}: <${selection.tagName}> (${this.domFramework()})${text ? `\n${text}` : ''}`
+        : text
     const userMessage = createUserMessage(shown, image, audio)
     this.messages.update((messages) => [...messages, userMessage])
     this.scrollRequest.set({ target: 'message', id: userMessage.id })

@@ -1,7 +1,7 @@
 <button
   type="button"
   part="launcher"
-  class="flex size-full items-center justify-center rounded-full bg-bac-primary text-bac-on-primary shadow-xl transition-transform hover:scale-105 hover:bg-bac-primary-hover active:scale-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-bac-primary"
+  class="relative flex size-full items-center justify-center rounded-full bg-bac-primary text-bac-on-primary shadow-xl transition-transform hover:scale-105 hover:bg-bac-primary-hover active:scale-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-bac-primary"
   [attr.aria-label]="t().openChat"
   [attr.title]="t().openChat"
   aria-haspopup="dialog"
@@ -11,4 +11,21 @@
   <span class="flex size-7 items-center justify-center">
     <ng-content />
   </span>
+  @if (watch.unread()) {
+    <span
+      part="launcher-unread"
+      role="status"
+      class="absolute -top-0.5 -right-0.5 size-3.5 rounded-full border-2 border-bac-bg bg-bac-danger"
+      [attr.aria-label]="t().watchUnread"
+      [attr.title]="t().watchUnread"
+    ></span>
+  } @else if (watch.status()) {
+    <span
+      part="launcher-watching"
+      role="status"
+      class="absolute -top-0.5 -right-0.5 size-3.5 animate-pulse rounded-full border-2 border-bac-bg bg-bac-success"
+      [attr.aria-label]="t().watchActiveBadge"
+      [attr.title]="t().watchActiveBadge"
+    ></span>
+  }
 </button>

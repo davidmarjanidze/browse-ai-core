@@ -22,7 +22,9 @@ export const EXTRA_TOOLS = [
     id: 'dark-pattern-detector',
     key: 'darkPatternDetector',
     promptOptional: true
-  }
+  },
+  { id: 'agent-mode', key: 'agentMode', promptOptional: false },
+  { id: 'watch-mode', key: 'watchMode', promptOptional: false }
 ] as const
 
 export type ExtraToolId = (typeof EXTRA_TOOLS)[number]['id']

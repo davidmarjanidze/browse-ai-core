@@ -10,7 +10,12 @@ import { getTools } from './tools.model'
 
 const allTools = () =>
   getTools(
-    { ...DEFAULT_FEATURES, domToComponent: true },
+    {
+      ...DEFAULT_FEATURES,
+      domToComponent: true,
+      agentMode: true,
+      watchMode: true
+    },
     DEFAULT_STRINGS,
     () => true
   )
@@ -27,11 +32,13 @@ describe('tool groups', () => {
     for (const tool of BUILT_IN_TOOL_IDS) expect(grouped).toContain(tool)
   })
 
-  it('lists tools by group, with Forms first', () => {
+  it('lists tools by group, with Forms first and Agents second', () => {
     const tools = allTools()
-    expect(tools.slice(0, 2).map((tool) => [tool.id, tool.group])).toEqual([
+    expect(tools.slice(0, 4).map((tool) => [tool.id, tool.group])).toEqual([
       ['form-filler', 'Forms'],
-      ['form-validator', 'Forms']
+      ['form-validator', 'Forms'],
+      ['agent-mode', 'Agents'],
+      ['watch-mode', 'Agents']
     ])
     const headings = groupOptions(
       tools.map((tool) => ({
@@ -42,12 +49,21 @@ describe('tool groups', () => {
     ).map((group) => group.label)
     expect(headings).toEqual([
       'Forms',
+      'Agents',
       'Read & understand',
       'Write',
       'Save & extract',
       'Safety',
       'Developer'
     ])
+  })
+
+  it('keeps Agent Mode and Watch Mode off by default', () => {
+    const ids = getTools(DEFAULT_FEATURES, DEFAULT_STRINGS).map(
+      (tool) => tool.id
+    )
+    expect(ids).not.toContain('agent-mode')
+    expect(ids).not.toContain('watch-mode')
   })
 
   it('drops headings of groups with no tools turned on', () => {

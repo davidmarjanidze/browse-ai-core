@@ -63,7 +63,10 @@
   </div>
 }
 
-@if (session.isInspecting() || session.domSelection()) {
+@if (
+  session.selectedTool() === 'dom-to-component' &&
+  (session.isInspecting() || session.domSelection())
+) {
   <div
     role="status"
     class="mb-3 flex items-center justify-between gap-2 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"

@@ -32,6 +32,34 @@
     <label>Email <input name="email" type="email" /></label>
   </form>
 
+  <h2>Shop (try Agent Mode)</h2>
+  @for (product of products; track product.name) {
+    <p style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+      <span>{{ product.name }}: ${{ product.price }}</span>
+      <label>
+        Size
+        <select #size [attr.aria-label]="'Size of ' + product.name">
+          <option>S</option>
+          <option>M</option>
+          <option>L</option>
+        </select>
+      </label>
+      <button type="button" (click)="addToCart(product.name, size.value)">
+        Add {{ product.name }} to cart
+      </button>
+    </p>
+  }
+  <p>Cart: {{ cart().length ? cart().join(', ') : 'empty' }}</p>
+  <button type="button" [disabled]="!cart().length" (click)="ordered.set(true)">
+    Place order
+  </button>
+  @if (ordered()) {
+    <p>Order placed.</p>
+  }
+
+  <h2>Ticker (try Watch Mode)</h2>
+  <p id="ticker">ACME stock: ${{ price() }}</p>
+
   <h2>Inline chat</h2>
   <div style="height: 480px">
     <browse-ai-core mode="inline" [palette]="palette()" [theme]="theme()" />

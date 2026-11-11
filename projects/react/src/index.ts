@@ -11,6 +11,8 @@ import {
 } from 'react'
 import 'browse-ai-core/element'
 import type {
+  AgentFinishedEvent,
+  AgentStepEvent,
   BrowseAiCoreConfig,
   BrowseAiCoreElement,
   ChatMode,
@@ -19,7 +21,8 @@ import type {
   PaletteName,
   ResponseReceivedEvent,
   ThemeChangeEvent,
-  ThemeMode
+  ThemeMode,
+  WatchMatchedEvent
 } from 'browse-ai-core'
 
 export interface BrowseAiCoreProps {
@@ -37,6 +40,9 @@ export interface BrowseAiCoreProps {
   onResponseReceived?: (event: ResponseReceivedEvent) => void
   onError?: (error: Error) => void
   onThemeChange?: (event: ThemeChangeEvent) => void
+  onAgentStep?: (event: AgentStepEvent) => void
+  onAgentFinished?: (event: AgentFinishedEvent) => void
+  onWatchMatched?: (event: WatchMatchedEvent) => void
   className?: string
   style?: CSSProperties
   /** Elements with a `slot` attribute: launcher-icon, header, empty-state, footer. */
@@ -51,7 +57,10 @@ const EVENTS = {
   messageSent: 'onMessageSent',
   responseReceived: 'onResponseReceived',
   errorOccurred: 'onError',
-  themeChange: 'onThemeChange'
+  themeChange: 'onThemeChange',
+  agentStep: 'onAgentStep',
+  agentFinished: 'onAgentFinished',
+  watchMatched: 'onWatchMatched'
 } as const satisfies Record<string, keyof BrowseAiCoreProps>
 
 type Handler = (detail: unknown) => void

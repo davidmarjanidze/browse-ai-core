@@ -16,6 +16,9 @@ page it's on, reads images and audio, and takes spoken questions. It also has
 tools to work with the page:
 
 - Forms: fill a form from your text, or check it before it is sent.
+- Agents (off by default): do a task on the page step by step (clicks,
+  typing, scrolling), or watch a part of the page and tell you when its text
+  changes the way you asked.
 - Reading: summarize, translate, find a part of the page or a link, map the
   argument of an article, and sum up product reviews.
 - Writing: write, rewrite or proofread text, draft a reply for a text box on
@@ -236,6 +239,8 @@ the input wins.
 | `storage`            | `StorageAdapter`                                               | see below          | Where settings and bookmarks are saved, see [storage](#storage).                   |
 | `screenCapture`      | `ScreenCaptureAdapter \| null`                                 | see below          | How screenshots are taken. `null` turns screenshots off.                           |
 | `storageKey`         | `string`                                                       | `'browse-ai-core'` | Key used in storage. Give two chats on one site different keys to keep them apart. |
+| `agent`              | `BrowseAiCoreAgentOptions`                                     | see below          | Limits for Agent Mode, see [Agent Mode](#agent-mode).                              |
+| `watch`              | `BrowseAiCoreWatchOptions`                                     | see below          | Timing for Watch Mode, see [Watch Mode](#watch-mode).                              |
 
 The `open` input (a property on the element) opens and closes the panel. In
 Angular use `[(open)]`, in Vue `v-model:open`, in React `open` with
@@ -243,7 +248,8 @@ Angular use `[(open)]`, in Vue `v-model:open`, in React `open` with
 
 ### Features
 
-All of them are on by default, except `domToComponent` and `bookmarks`.
+All of them are on by default, except `domToComponent`, `bookmarks`,
+`agentMode` and `watchMode`.
 
 | Name                   | Description                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------ |
@@ -275,6 +281,8 @@ All of them are on by default, except `domToComponent` and `bookmarks`.
 | `performanceExplainer` | Tool that shows the page's speed numbers in live charts and explains them.                 |
 | `phishingCheck`        | Tool that looks for phishing and scam signs on the page and gives a risk level.            |
 | `darkPatternDetector`  | Tool that finds pre-checked extras, fake timers and similar tricks, and marks them.        |
+| `agentMode`            | Tool that does a task on the page step by step. See [Agent Mode](#agent-mode).             |
+| `watchMode`            | Tool that watches a part of the page for a text change. See [Watch Mode](#watch-mode).     |
 | `settings`             | Settings panel.                                                                            |
 | `personalization`      | Nickname and custom instructions in settings. They're added to every prompt.               |
 | `appearance`           | Theme and palette pickers in settings. The user's choice wins over `theme` and `palette`.  |
@@ -288,8 +296,8 @@ chat.config = {
 ```
 
 The tools are listed in the Tools select under the input, grouped under
-headings: Forms, Read & understand, Write, Save & extract, Safety and
-Developer. A heading is hidden when all of its tools are turned off. When a
+headings: Forms, Agents, Read & understand, Write, Save & extract, Safety
+and Developer. A heading is hidden when all of its tools are turned off. When a
 tool is picked, a green "How to use" box shows its steps.
 
 ## Styling
@@ -391,11 +399,15 @@ browse-ai-core::part(message-user) {
 Parts: `launcher`, `panel`, `header`, `messages`, `message-user`,
 `message-assistant`, `message-error`, `tool-card`, `composer`, `input`,
 `send-button`, `stop-button`, `attach-button`, `mic-button`, `menu`,
-`listbox`, `selection-actions` and `toast`.
+`listbox`, `selection-actions`, `agent-panel`, `watch-status`,
+`launcher-watching`, `launcher-unread` and `toast`.
 
 `tool-card` is the box under a tool's answer, for example the links, the
 rating bars or the speed charts. `selection-actions` is the bar of buttons
-next to text selected on the page.
+next to text selected on the page. `agent-panel` is the step list while
+Agent Mode runs, and `watch-status` is the box with the Stop button while Watch
+Mode runs. `launcher-watching` and `launcher-unread` are the dots on the
+launcher while watching and after a change was found.
 
 ### Layout
 
@@ -546,6 +558,10 @@ audio. To stream the answer, add `promptStreaming(input, { signal })` that
 returns an async iterable (or a `ReadableStream`) of text chunks. To fill the
 memory badge, set `contextUsage` and `contextWindow` on the session.
 
+Agent Mode and Watch Mode pass `{ signal, responseConstraint }` to `prompt`,
+where `responseConstraint` is a JSON schema for the answer. A provider that
+can't use it can ignore it; the answer is checked in code either way.
+
 `chromeLanguageModelProvider()` is the default provider. It's exported in case
 you want to wrap it.
 
@@ -592,6 +608,71 @@ The mic button and the Dictation tool record with `MediaRecorder` and send the
 audio to the chat model to turn it into text. With the default model the audio
 stays on the device. With your own `aiProvider`, the audio goes to that
 provider. Recordings stop after 60 seconds and are not saved.
+
+## Agent Mode
+
+Turn it on with `features: { agentMode: true }`. Pick Agent Mode under
+Agents in the Tools select and describe a task, for example "Add the cheapest
+red shirt in size M to the cart".
+
+The assistant works in steps. Each step it reads the visible buttons, links
+and fields of the page (with a number for each), picks one action and runs
+it: click, type, choose an option, check a box, press a key, hover, scroll,
+go back, or wait for something to appear or for the page to stop loading. It
+can also take a screenshot with the numbers drawn on it, and ask you a
+question; your next message is the answer. The steps are listed above the
+input while it works, and in the answer at the end.
+
+It asks before it clicks a submit button, a button whose name contains a word
+like buy, pay, order, delete, send or confirm (`agentRiskWords` in `strings`),
+or a link to another page. It never reads or fills password, card or one-time
+code fields. Stop ends the run at any time.
+
+```js
+chat.config = {
+  features: { agentMode: true },
+  agent: {
+    maxSteps: 25, // default
+    maxDurationMs: 300000, // default, 5 minutes
+    confirm: 'risky' // 'risky' (default), 'always' or 'never'
+  }
+}
+```
+
+The run ends when the page loads a new address. Screenshots need the
+`screenCapture` adapter and a model that accepts images; without them the
+assistant works from the element list only. A small model such as Gemini Nano
+can lose track in long tasks, so short, clear tasks work best.
+
+## Watch Mode
+
+Turn it on with `features: { watchMode: true }`. Pick Watch Mode under Agents,
+click Select element and click the part of the page to watch, like a price or
+an order status. While picking, Arrow Up and Arrow Down move to the parent or
+child element, and Esc cancels. Then describe what to look for, for example
+"Tell me when the price is below 100", and send.
+
+Only text is watched (including form values), not colors or images. The text
+is read every 15 seconds. When it is the same as last time, the model is not
+asked. When it changed, the model gets the text from the start, from the last
+check and now, and decides if this is the change you asked for. When it is at
+least 70% sure, the chat posts a message, and the launcher shows a dot if the
+panel is closed. Watching goes on until you click Stop.
+
+```js
+chat.config = {
+  features: { watchMode: true },
+  watch: {
+    intervalMs: 15000, // default, at least 5000
+    threshold: 0.7 // default, 0 to 1
+  }
+}
+```
+
+If the page draws the element again (common in React, Vue and Angular apps),
+it is found again by its id, test id or position. Browsers slow down timers in
+background tabs, so checks can be late there. One element is watched per chat
+at a time.
 
 ## Screenshots
 
@@ -647,15 +728,18 @@ The group headings in the Tools select are `toolGroupForms`, `toolGroupRead`,
 
 ## Events
 
-| Angular / element  | React                | Vue                | Payload                                            |
-| ------------------ | -------------------- | ------------------ | -------------------------------------------------- |
-| `opened`           | `onOpened`           | `opened`           | none                                               |
-| `closed`           | `onClosed`           | `closed`           | none                                               |
-| `openChange`       | `onOpenChange`       | `update:open`      | `boolean`                                          |
-| `messageSent`      | `onMessageSent`      | `messageSent`      | `{ text, hasImage, hasAudio }`                     |
-| `responseReceived` | `onResponseReceived` | `responseReceived` | `{ text }`                                         |
-| `errorOccurred`    | `onError`            | `error`            | `Error`                                            |
-| `themeChange`      | `onThemeChange`      | `themeChange`      | `{ theme, mode }`, where `mode` is the mode in use |
+| Angular / element  | React                | Vue                | Payload                                                   |
+| ------------------ | -------------------- | ------------------ | --------------------------------------------------------- |
+| `opened`           | `onOpened`           | `opened`           | none                                                      |
+| `closed`           | `onClosed`           | `closed`           | none                                                      |
+| `openChange`       | `onOpenChange`       | `update:open`      | `boolean`                                                 |
+| `messageSent`      | `onMessageSent`      | `messageSent`      | `{ text, hasImage, hasAudio }`                            |
+| `responseReceived` | `onResponseReceived` | `responseReceived` | `{ text }`                                                |
+| `errorOccurred`    | `onError`            | `error`            | `Error`                                                   |
+| `themeChange`      | `onThemeChange`      | `themeChange`      | `{ theme, mode }`, where `mode` is the mode in use        |
+| `agentStep`        | `onAgentStep`        | `agentStep`        | `{ step, tool, args, result }`                            |
+| `agentFinished`    | `onAgentFinished`    | `agentFinished`    | `{ status, summary }`                                     |
+| `watchMatched`     | `onWatchMatched`     | `watchMatched`     | `{ instruction, previous, current, message, confidence }` |
 
 On the element, the payload is in `event.detail`.
 

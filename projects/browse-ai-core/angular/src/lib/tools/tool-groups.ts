@@ -10,6 +10,7 @@ export const TOOL_GROUPS: readonly {
   tools: readonly ToolId[]
 }[] = [
   { label: 'toolGroupForms', tools: ['form-filler', 'form-validator'] },
+  { label: 'toolGroupAgents', tools: ['agent-mode', 'watch-mode'] },
   {
     label: 'toolGroupRead',
     tools: [

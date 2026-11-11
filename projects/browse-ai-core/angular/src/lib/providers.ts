@@ -34,6 +34,9 @@ import { PhishingCheckService } from './tools/phishing-check/phishing-check.serv
 import { ReplyDrafterService } from './tools/reply-drafter/reply-drafter.service'
 import { ResearchService } from './tools/research/research.service'
 import { ReviewSummarizerService } from './tools/review-summarizer/review-summarizer.service'
+import { ToolNotices } from './chat/tool-notices'
+import { AgentRunnerService } from './tools/agent/agent-runner.service'
+import { WatchRunnerService } from './tools/watch/watch-runner.service'
 
 /**
  * Every service of one chat instance. Provided on the root component, so
@@ -69,6 +72,9 @@ export const CHAT_INSTANCE_PROVIDERS: Provider[] = [
   PerformanceExplainerService,
   PhishingCheckService,
   DarkPatternDetectorService,
+  ToolNotices,
+  AgentRunnerService,
+  WatchRunnerService,
   ExtraToolRunner,
   ToolRunner,
   ChatEvents,

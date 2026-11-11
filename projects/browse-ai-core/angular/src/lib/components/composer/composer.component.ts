@@ -4,6 +4,8 @@ import { ComposerInputComponent } from './composer-input.component'
 import { ComposerToolbarComponent } from './composer-toolbar.component'
 import { ToolOptionsComponent } from './tool-options.component'
 import { VoiceBarComponent } from './voice-bar.component'
+import { AgentPanelComponent } from '../agents/agent-panel.component'
+import { WatchPanelComponent } from '../agents/watch-panel.component'
 
 @Component({
   selector: 'bac-composer',
@@ -12,7 +14,9 @@ import { VoiceBarComponent } from './voice-bar.component'
     ComposerContextComponent,
     ComposerInputComponent,
     ToolOptionsComponent,
-    VoiceBarComponent
+    VoiceBarComponent,
+    AgentPanelComponent,
+    WatchPanelComponent
   ],
   templateUrl: './composer.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

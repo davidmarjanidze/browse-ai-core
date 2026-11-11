@@ -86,6 +86,10 @@ export interface BrowseAiCoreFeatures {
   phishingCheck: boolean
   /** Tool that finds dark patterns such as pre-checked boxes and fake timers. */
   darkPatternDetector: boolean
+  /** Agent Mode: does a task on the page with clicks, typing and scrolling. */
+  agentMode: boolean
+  /** Watch Mode: watches a part of the page for a text change. */
+  watchMode: boolean
   /** Settings panel (appearance and personalization). */
   settings: boolean
   /** Nickname and custom instructions in settings. */
@@ -111,6 +115,25 @@ export interface BrowseAiCoreAiOptions {
   builtInTools?: BuiltInToolsOptions
 }
 
+/** When Agent Mode asks before an action. */
+export type AgentConfirmMode = 'risky' | 'always' | 'never'
+
+export interface BrowseAiCoreAgentOptions {
+  /** Most steps in one run. Default 25. */
+  maxSteps?: number
+  /** Longest run in milliseconds. Default 300000 (5 minutes). */
+  maxDurationMs?: number
+  /** Default `risky`: ask before pay, send, delete, submit and leaving the page. */
+  confirm?: AgentConfirmMode
+}
+
+export interface BrowseAiCoreWatchOptions {
+  /** Time between checks in milliseconds. Default 15000, at least 5000. */
+  intervalMs?: number
+  /** How sure the model must be (0 to 1) before the chat reports a change. Default 0.7. */
+  threshold?: number
+}
+
 export interface BrowseAiCoreConfig {
   theme?: ThemeMode
   palette?: PaletteName
@@ -127,6 +150,10 @@ export interface BrowseAiCoreConfig {
   screenCapture?: ScreenCaptureAdapter | null
   /** Prefix of every key written to storage. Default `browse-ai-core`. */
   storageKey?: string
+  /** Limits for Agent Mode. */
+  agent?: BrowseAiCoreAgentOptions
+  /** Timing for Watch Mode. */
+  watch?: BrowseAiCoreWatchOptions
 }
 
 export interface ResolvedBrowseAiCoreConfig {
@@ -143,6 +170,8 @@ export interface ResolvedBrowseAiCoreConfig {
   storage: StorageAdapter
   screenCapture: ScreenCaptureAdapter | null
   storageKey: string
+  agent: Required<BrowseAiCoreAgentOptions>
+  watch: Required<BrowseAiCoreWatchOptions>
 }
 
 export const DEFAULT_FEATURES: BrowseAiCoreFeatures = {
@@ -174,6 +203,8 @@ export const DEFAULT_FEATURES: BrowseAiCoreFeatures = {
   performanceExplainer: true,
   phishingCheck: true,
   darkPatternDetector: true,
+  agentMode: false,
+  watchMode: false,
   settings: true,
   personalization: true,
   appearance: true,
@@ -190,6 +221,26 @@ const POSITIONS: readonly ChatPosition[] = [
 ]
 const MODES: readonly ChatMode[] = ['floating', 'drawer', 'inline']
 const CONTEXT_MODES: readonly ContextMode[] = ['page', 'general']
+const CONFIRM_MODES: readonly AgentConfirmMode[] = ['risky', 'always', 'never']
+
+export const DEFAULT_AGENT_OPTIONS: Required<BrowseAiCoreAgentOptions> = {
+  maxSteps: 25,
+  maxDurationMs: 300_000,
+  confirm: 'risky'
+}
+
+export const DEFAULT_WATCH_OPTIONS: Required<BrowseAiCoreWatchOptions> = {
+  intervalMs: 15_000,
+  threshold: 0.7
+}
+
+/** Shortest time between Watch Mode checks. */
+export const MIN_WATCH_INTERVAL_MS = 5_000
+
+const positive = (value: unknown, fallback: number): number =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? value
+    : fallback
 
 const pick = <T>(allowed: readonly T[], value: unknown, fallback: T): T =>
   allowed.includes(value as T) ? (value as T) : fallback
@@ -231,6 +282,8 @@ export function resolveConfig(
   const features: Partial<BrowseAiCoreFeatures> = {}
   const ai: BrowseAiCoreAiOptions = {}
   const strings: Partial<BrowseAiCoreStrings> = {}
+  const agent: BrowseAiCoreAgentOptions = {}
+  const watch: BrowseAiCoreWatchOptions = {}
 
   for (const config of configs) {
     if (!config) continue
@@ -238,6 +291,8 @@ export function resolveConfig(
     Object.assign(features, defined(config.features))
     Object.assign(ai, defined(config.ai))
     Object.assign(strings, defined(config.strings))
+    Object.assign(agent, defined(config.agent))
+    Object.assign(watch, defined(config.watch))
   }
 
   return {
@@ -255,6 +310,28 @@ export function resolveConfig(
       merged.screenCapture === undefined
         ? getDefaultAdapters().screenCapture
         : merged.screenCapture,
-    storageKey: merged.storageKey ?? 'browse-ai-core'
+    storageKey: merged.storageKey ?? 'browse-ai-core',
+    agent: {
+      maxSteps: Math.round(
+        positive(agent.maxSteps, DEFAULT_AGENT_OPTIONS.maxSteps)
+      ),
+      maxDurationMs: positive(
+        agent.maxDurationMs,
+        DEFAULT_AGENT_OPTIONS.maxDurationMs
+      ),
+      confirm: pick(CONFIRM_MODES, agent.confirm, DEFAULT_AGENT_OPTIONS.confirm)
+    },
+    watch: {
+      intervalMs: Math.max(
+        MIN_WATCH_INTERVAL_MS,
+        positive(watch.intervalMs, DEFAULT_WATCH_OPTIONS.intervalMs)
+      ),
+      threshold:
+        typeof watch.threshold === 'number' &&
+        watch.threshold >= 0 &&
+        watch.threshold <= 1
+          ? watch.threshold
+          : DEFAULT_WATCH_OPTIONS.threshold
+    }
   }
 }

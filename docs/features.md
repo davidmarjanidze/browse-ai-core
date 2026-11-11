@@ -34,6 +34,8 @@ The table shows the default and where the code is (paths under
 | Performance Explainer     | `performanceExplainer` | on      | `tools/performance/`, `ui/charts/`                                        |
 | Scam Check                | `phishingCheck`        | on      | `tools/phishing-check/`                                                   |
 | Dark Pattern Detector     | `darkPatternDetector`  | on      | `tools/dark-patterns/`, `page/marker-layer.ts`                            |
+| Agent Mode                | `agentMode`            | off     | `tools/agent/`, `components/agents/agent-panel.component.ts`              |
+| Watch Mode                | `watchMode`            | off     | `tools/watch/`, `components/agents/watch-panel.component.ts`              |
 | Settings panel            | `settings`             | on      | `components/settings/`                                                    |
 | Personalization           | `personalization`      | on      | `components/settings/`, `ai/prompt-builder.ts`                            |
 | Theme and palette pickers | `appearance`           | on      | `components/settings/`, `core/theme.store.ts`                             |
@@ -85,8 +87,8 @@ says how much was cut. In general mode nothing from the page is sent.
 ## Tools
 
 Picked from the Tools select under the input. The select groups tools under
-headings, in this order: Forms, Read & understand, Write, Save & extract,
-Safety, Developer (`tools/tool-groups.ts`). A heading is hidden when none of
+headings, in this order: Forms, Agents, Read & understand, Write, Save &
+extract, Safety, Developer (`tools/tool-groups.ts`). A heading is hidden when none of
 its tools are on. Each tool shows a green "How to use" box with its steps
 (`<tool>Notes` strings). Shared rules for tools are in
 [decision 16](decisions.md#16-shared-rules-for-new-tools).
@@ -165,8 +167,26 @@ its tools are on. Each tool shows a green "How to use" box with its steps
   weak decline buttons, items added to the basket and cancel pages without a
   cancel button. Each finding is marked on the page; pre-checked boxes can be
   unchecked.
+- **Agent Mode** (spec T-001). A loop in `agent-runner.service.ts`: list the
+  visible interactive elements with numbers (`page-snapshot.ts`), send the
+  task, the last step and the list to the model, read one JSON tool call
+  (`agent-protocol.ts`, ADR 0001 in `specs/decisions/`), run it
+  (`agent-tools.ts`, `page-actions.ts`, `page-waits.ts`), repeat. Risky steps
+  wait for Allow / Deny (`risk-check.ts`). `ask_user` pauses the run and the
+  next chat message is the answer. Limits: `agent.maxSteps`,
+  `agent.maxDurationMs`, 3 bad answers in a row. When the model session is
+  75% full, a new one starts with a recap of the steps.
+- **Watch Mode** (spec T-002). The element is picked with the same picker as
+  DOM Element to Component (Arrow Up / Down for parent / child). A timer
+  (`watch.intervalMs`) reads the element's text (`watched-text.ts`); the model
+  is only asked when it changed (`watch-prompt.ts`). A `MutationObserver`
+  keeps texts seen between checks, so short changes are not lost. The
+  element is found again after a re-render (`element-locator.ts`). Matches at
+  or above `watch.threshold` are posted with `ToolNotices` and fire
+  `watchMatched`; the watch runs until Stop.
 
-While a response or tool runs, only Stop is enabled in the composer.
+While a response or tool runs, only Stop is enabled in the composer, except
+when Agent Mode asks a question.
 
 ## Voice input
 

@@ -1,0 +1,86 @@
+@let strings = t();
+@if (watch.status(); as status) {
+  <div
+    part="watch-status"
+    role="status"
+    class="mb-3 flex items-center justify-between gap-2 rounded-bac border border-bac-primary bg-bac-accent-soft px-3 py-2 text-xs text-bac-accent-text"
+  >
+    <div class="min-w-0">
+      <p class="m-0 truncate font-semibold">
+        {{ strings.watchStatus | bacFormat: { element: status.label } }}
+      </p>
+      <p class="m-0 truncate">{{ status.instruction }}</p>
+      <p class="m-0">
+        {{
+          strings.watchChecks
+            | bacFormat: { checks: status.checks, matches: status.matches }
+        }}
+      </p>
+    </div>
+    <bac-button
+      variant="secondary"
+      icon="stop"
+      [label]="strings.watchStop"
+      (buttonClick)="watch.stop()"
+    />
+  </div>
+}
+
+@if (session.selectedTool() === 'watch-mode') {
+  <div
+    role="status"
+    class="mb-3 flex items-center justify-between gap-2 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"
+  >
+    <div class="min-w-0">
+      @if (watch.isPicking()) {
+        {{ strings.watchPicking }}
+        @if (session.hoveredElementLabel(); as label) {
+          <span class="block truncate font-semibold">{{ label }}</span>
+        }
+      } @else if (watch.picked(); as picked) {
+        <span class="font-semibold">{{ strings.watchSelected }}</span>
+        {{ picked.label }}
+        <span class="block truncate text-bac-text-muted">{{
+          picked.preview
+        }}</span>
+      } @else {
+        {{ strings.watchNoElement }}
+      }
+      @if (watch.picked() && !session.prompt().trim()) {
+        <span class="block text-bac-text-muted">{{
+          strings.watchNeedInstruction
+        }}</span>
+      }
+    </div>
+    <div class="flex shrink-0 gap-2">
+      @if (watch.isPicking()) {
+        <bac-button
+          variant="ghost"
+          icon="close"
+          [ariaLabel]="strings.cancelInspector"
+          (buttonClick)="watch.cancelPick()"
+        />
+      } @else if (watch.picked()) {
+        <bac-button
+          variant="secondary"
+          [label]="strings.watchChangeElement"
+          [disabled]="session.isBusy()"
+          (buttonClick)="watch.pick()"
+        />
+        <bac-button
+          variant="ghost"
+          [label]="strings.watchRemoveElement"
+          [disabled]="session.isBusy()"
+          (buttonClick)="watch.clearPick()"
+        />
+      } @else {
+        <bac-button
+          variant="secondary"
+          [label]="strings.watchSelectElement"
+          [disabled]="session.isBusy()"
+          (buttonClick)="watch.pick()"
+        />
+      }
+    </div>
+  </div>
+}

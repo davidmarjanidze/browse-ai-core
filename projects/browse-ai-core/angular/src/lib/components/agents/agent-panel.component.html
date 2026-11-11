@@ -1,0 +1,68 @@
+@let strings = t();
+@if (agent.running()) {
+  <div
+    part="agent-panel"
+    role="status"
+    aria-live="polite"
+    class="mb-3 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"
+  >
+    <p class="m-0 font-semibold">{{ strings.agentRunning }}</p>
+    @if (agent.canScreenshot()) {
+      <p class="m-0 mt-1 text-bac-text-muted">
+        {{ strings.agentScreenAccess }}
+      </p>
+    }
+    @if (recentSteps().length) {
+      <ol class="mt-1 mb-0 list-none p-0">
+        @for (step of recentSteps(); track step.step) {
+          <li class="flex gap-2 leading-relaxed">
+            <span class="shrink-0 tabular-nums">{{ step.step }}.</span>
+            <span class="min-w-0 flex-1 truncate">
+              {{ step.tool }}
+              @if (step.target) {
+                — {{ step.target }}
+              }
+            </span>
+            <span
+              class="shrink-0"
+              [class.text-bac-danger]="step.status === 'error'"
+              [class.text-bac-warning]="step.status === 'denied'"
+              >{{ statusLabel()[step.status] }}</span
+            >
+          </li>
+        }
+      </ol>
+    }
+
+    @if (agent.confirmation(); as confirmation) {
+      <div
+        role="alertdialog"
+        [attr.aria-label]="strings.agentConfirmTitle"
+        class="mt-2 rounded-bac border border-bac-warning bg-bac-warning-soft px-3 py-2"
+      >
+        <p class="m-0 font-semibold">{{ strings.agentConfirmTitle }}</p>
+        <p class="m-0 mt-1">
+          {{ confirmation.tool }}
+          @if (confirmation.target) {
+            — {{ confirmation.target }}
+          }
+        </p>
+        @if (confirmation.reason === 'navigate') {
+          <p class="m-0 mt-1">{{ strings.agentConfirmNavigate }}</p>
+        }
+        <div class="mt-2 flex gap-2">
+          <bac-button
+            variant="primary"
+            [label]="strings.agentAllow"
+            (buttonClick)="agent.decide(true)"
+          />
+          <bac-button
+            variant="secondary"
+            [label]="strings.agentDeny"
+            (buttonClick)="agent.decide(false)"
+          />
+        </div>
+      </div>
+    }
+  </div>
+}
