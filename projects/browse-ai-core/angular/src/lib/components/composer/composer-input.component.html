@@ -3,7 +3,9 @@
   [placeholder]="
     session.agent.question() !== null
       ? t().agentAnswerPlaceholder
-      : t().inputPlaceholder
+      : session.agent.running()
+        ? t().agentSteerPlaceholder
+        : t().inputPlaceholder
   "
   [disabled]="session.inputLocked()"
   [(value)]="session.prompt"
@@ -82,7 +84,7 @@
     <bac-icon class="size-4" name="stop" />
   </button>
 }
-@if (!session.isBusy() || session.agent.question() !== null) {
+@if (!session.isBusy() || session.agent.running()) {
   <button
     type="button"
     part="send-button"

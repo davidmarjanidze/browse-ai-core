@@ -6,6 +6,7 @@ import {
 } from '@angular/core'
 import { ChatSessionStore } from '../../chat/chat-session.store'
 import { AgentRunnerService } from '../../tools/agent/agent-runner.service'
+import { FormatPipe } from '../../core/format.pipe'
 import { ButtonComponent } from '../../ui/button/button.component'
 
 /** Most recent steps shown while Agent Mode runs. */
@@ -14,7 +15,7 @@ const VISIBLE_STEPS = 8
 /** Agent Mode's live step list and the Allow / Deny prompt. */
 @Component({
   selector: 'bac-agent-panel',
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, FormatPipe],
   templateUrl: './agent-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' }

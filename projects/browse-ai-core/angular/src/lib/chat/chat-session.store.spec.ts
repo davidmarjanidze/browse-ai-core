@@ -236,4 +236,28 @@ describe('ChatSessionStore', () => {
     expect(contents[2]).toBe('The first')
     expect(contents[3]).toContain('Finished.')
   })
+
+  it('passes messages sent during an Agent Mode run to the agent', async () => {
+    let calls = 0
+    const { session } = await setup(
+      {
+        reply: () =>
+          ++calls === 1
+            ? '{"tool":"wait","args":{"ms":50}}'
+            : '{"tool":"done","args":{"summary":"Finished."}}'
+      },
+      { features: { agentMode: true } }
+    )
+    session.selectTool('agent-mode')
+    session.prompt.set('Do it')
+    const running = session.send()
+    await vi.waitFor(() => expect(session.agent.running()).toBe(true))
+    expect(session.inputLocked()).toBe(false)
+    session.prompt.set('Go faster')
+    expect(session.canSend()).toBe(true)
+    await session.send()
+    await running
+    expect(session.agent.updates()).toEqual(['Go faster'])
+    expect(session.messages().map((m) => m.content)).toContain('Go faster')
+  })
 })

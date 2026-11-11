@@ -199,6 +199,19 @@ describe('agent protocol', () => {
     ).toEqual({ error: expect.stringContaining('must be one of') })
   })
 
+  it('keeps user updates in every prompt and marks a new one', () => {
+    const prompt = buildStepPrompt({
+      task: 'T',
+      page: 'P',
+      steps: [],
+      recap: false,
+      updates: ['first', 'second'],
+      newUpdate: false
+    })
+    expect(prompt).toContain('- first\n- second')
+    expect(prompt).not.toContain('is new')
+  })
+
   it('leaves screenshot out without screen capture', () => {
     expect(agentTools(false).some((tool) => tool.name === 'screenshot')).toBe(
       false
@@ -344,5 +357,34 @@ describe('AgentRunnerService', () => {
     const result = await running
     expect(result.content).toContain('Stopped.')
     expect(agent.running()).toBe(false)
+  })
+
+  it('reads instructions the user sends while it works', async () => {
+    const prompts: string[] = []
+    let agentRef: AgentRunnerService | null = null
+    const { agent } = setup((input) => {
+      prompts.push(promptText(input))
+      if (prompts.length === 1) {
+        agentRef?.steer('Use the blue one instead')
+        return '{"tool":"done","args":{"summary":"early"}}'
+      }
+      return '{"tool":"done","args":{"summary":"Used the blue one."}}'
+    })
+    agentRef = agent
+    const result = await agent.run(request('Pick the red one'))
+    expect(prompts.length).toBe(2)
+    expect(prompts[1]).toContain(
+      'USER UPDATES (newest last):\n- Use the blue one instead'
+    )
+    expect(prompts[1]).toContain('The newest update is new.')
+    expect(prompts[1]).toContain('before you finished')
+    expect(result.content).toContain('Used the blue one.')
+    expect(agent.updates()).toEqual(['Use the blue one instead'])
+  })
+
+  it('ignores instructions when no run is going', () => {
+    const { agent } = setup([])
+    agent.steer('hello')
+    expect(agent.updates()).toEqual([])
   })
 })

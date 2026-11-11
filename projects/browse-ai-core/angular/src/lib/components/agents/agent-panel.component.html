@@ -7,6 +7,12 @@
     class="mb-3 rounded-bac border border-bac-border bg-bac-surface px-3 py-2 text-xs"
   >
     <p class="m-0 font-semibold">{{ strings.agentRunning }}</p>
+    <p class="m-0 mt-1 text-bac-text-muted">{{ strings.agentSteerHint }}</p>
+    @if (agent.updates().at(-1); as latest) {
+      <p class="m-0 mt-1 truncate">
+        {{ strings.agentLatestUpdate | bacFormat: { text: latest } }}
+      </p>
+    }
     @if (agent.canScreenshot()) {
       <p class="m-0 mt-1 text-bac-text-muted">
         {{ strings.agentScreenAccess }}

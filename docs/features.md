@@ -174,7 +174,10 @@ its tools are on. Each tool shows a green "How to use" box with its steps
   (`agent-tools.ts`, `page-actions.ts`, `page-waits.ts`), repeat. Risky steps
   wait for Allow / Deny (`risk-check.ts`). `ask_user` pauses the run and the
   next chat message is the answer. Limits: `agent.maxSteps`,
-  `agent.maxDurationMs`, 3 bad answers in a row. When the model session is
+  `agent.maxDurationMs`, 3 bad answers in a row. Messages sent during a run
+  go to `steer()` and are listed as USER UPDATES in every later step prompt
+  (newest 5); a `done` or `fail` that arrives before the model saw a new
+  update is ignored and the loop goes on. When the model session is
   75% full, a new one starts with a recap of the steps.
 - **Watch Mode** (spec T-002). The element is picked with the same picker as
   DOM Element to Component (Arrow Up / Down for parent / child). A timer
@@ -186,7 +189,7 @@ its tools are on. Each tool shows a green "How to use" box with its steps
   `watchMatched`; the watch runs until Stop.
 
 While a response or tool runs, only Stop is enabled in the composer, except
-when Agent Mode asks a question.
+during an Agent Mode run, where messages go to the agent.
 
 ## Voice input
 

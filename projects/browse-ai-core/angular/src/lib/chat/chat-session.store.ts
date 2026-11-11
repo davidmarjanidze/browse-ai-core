@@ -123,13 +123,11 @@ export class ChatSessionStore {
     this.builtIn.states()
     return this.builtIn.isReady(tool) ? null : tool
   })
-  /** The composer is locked, except to answer Agent Mode's question. */
-  readonly inputLocked = computed(
-    () => this.isBusy() && this.agent.question() === null
-  )
+  /** The composer is locked while something runs, except for Agent Mode. */
+  readonly inputLocked = computed(() => this.isBusy() && !this.agent.running())
   readonly canSend = computed(() => {
     const tool = this.selectedTool()
-    if (this.agent.question() !== null) return Boolean(this.prompt().trim())
+    if (this.agent.running()) return Boolean(this.prompt().trim())
     if (this.isBusy()) return false
     if (isBuiltInTool(tool)) {
       return this.builtIn.isReady(tool) && Boolean(this.prompt().trim())
@@ -249,11 +247,12 @@ export class ChatSessionStore {
     if (!this.canSend()) return
 
     const text = this.prompt().trim()
-    if (this.agent.question() !== null) {
+    if (this.agent.running()) {
       this.messages.update((messages) => [...messages, createUserMessage(text)])
       this.scrollRequest.set({ target: 'bottom' })
       this.prompt.set('')
-      this.agent.answer(text)
+      if (this.agent.question() !== null) this.agent.answer(text)
+      else this.agent.steer(text)
       return
     }
     const image = this.image() ?? undefined

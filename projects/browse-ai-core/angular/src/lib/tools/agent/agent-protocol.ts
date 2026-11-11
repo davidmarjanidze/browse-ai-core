@@ -16,6 +16,8 @@ export interface AgentStepRecord {
   result: string
 }
 
+/** User updates kept in each prompt. */
+export const MAX_UPDATES = 5
 /** Steps kept in full when the history is sent again. */
 export const FULL_STEPS = 5
 const MAX_RESULT_CHARS = 1_500
@@ -43,6 +45,7 @@ export function buildAgentSystemPrompt(tools: readonly AgentTool[]): string {
     '- If something you need is not listed, scroll, use find_text, or take a screenshot.',
     '- After an action that loads content, use wait_for or wait_for_idle.',
     '- Use ask_user only when you cannot go on without the user.',
+    '- USER UPDATES are messages the user sent while you work. They correct or change the task, or tell you how to get unstuck. Follow the newest one when they disagree with the task.',
     '- Call done when the task is finished, or fail when it cannot be done.',
     '- Never type passwords or card numbers.',
     'TOOLS:',
@@ -87,8 +90,13 @@ export function buildStepPrompt(options: {
   recap: boolean
   note?: string
   hasImage?: boolean
+  /** Instructions the user sent during the run, oldest first. */
+  updates?: string[]
+  /** The newest update was not sent to the model yet. */
+  newUpdate?: boolean
 }): string {
   const { task, page, steps, recap, note, hasImage } = options
+  const updates = (options.updates ?? []).slice(-MAX_UPDATES)
   const last = steps[steps.length - 1]
   const history = recap
     ? steps.map((record, index) =>
@@ -102,6 +110,15 @@ export function buildStepPrompt(options: {
     ...(history.length
       ? [recap ? 'STEPS SO FAR:' : 'LAST STEP:', ...history]
       : ['This is the first step.']),
+    ...(updates.length
+      ? [
+          'USER UPDATES (newest last):',
+          ...updates.map((update) => `- ${cut(update, 500)}`),
+          ...(options.newUpdate
+            ? ['The newest update is new. Change your plan to follow it now.']
+            : [])
+        ]
+      : []),
     ...(note ? [`NOTE: ${note}`] : []),
     ...(hasImage
       ? [

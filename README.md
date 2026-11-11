@@ -621,6 +621,11 @@ can also take a screenshot with the numbers drawn on it, and ask you a
 question; your next message is the answer. The steps are listed above the
 input while it works, and in the answer at the end.
 
+The input stays open while it works. Send a message at any time to correct the
+task, change direction, or tell it how to get past a step where it is stuck.
+It reads the message at its next step and follows the newest instruction. If
+it was about to finish, it goes on with your instruction instead.
+
 It asks before it clicks a submit button, a button whose name contains a word
 like buy, pay, order, delete, send or confirm (`agentRiskWords` in `strings`),
 or a link to another page. It never reads or fills password, card or one-time

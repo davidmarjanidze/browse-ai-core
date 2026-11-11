@@ -73,6 +73,8 @@ export class AgentRunnerService {
   readonly steps = signal<AgentStepView[]>([])
   /** Question from `ask_user`, waiting for the user's next message. */
   readonly question = signal<string | null>(null)
+  /** Instructions the user sent while the run is going, oldest first. */
+  readonly updates = signal<string[]>([])
   /** Risky step waiting for Allow or Deny. */
   readonly confirmation = signal<AgentConfirmation | null>(null)
 
@@ -89,6 +91,12 @@ export class AgentRunnerService {
       this.#config.config().screenCapture !== null &&
       this.#ai.supportsImageInput()
     )
+  }
+
+  /** Adds an instruction from the user. The agent reads it at its next step. */
+  steer(text: string): void {
+    if (!this.running() || !text.trim()) return
+    this.updates.update((updates) => [...updates, text.trim()])
   }
 
   answer(text: string): void {
@@ -110,6 +118,7 @@ export class AgentRunnerService {
     this.#onAnswer = null
     this.question.set(null)
     this.steps.set([])
+    this.updates.set([])
   }
 
   async run(request: ToolRequest): Promise<ToolResult> {
@@ -148,6 +157,8 @@ export class AgentRunnerService {
     }
 
     this.steps.set([])
+    this.updates.set([])
+    let seenUpdates = 0
     this.running.set(true)
     let ending: Ending = { status: 'stopped', text: '' }
     try {
@@ -169,14 +180,18 @@ export class AgentRunnerService {
         const page = formatSnapshot(
           takeSnapshot(this.#document, this.#host, refs)
         )
+        const updates = this.updates()
         const prompt = buildStepPrompt({
           task: request.text,
           page,
           steps: records,
           recap,
           note,
-          hasImage: image !== null
+          hasImage: image !== null,
+          updates,
+          newUpdate: updates.length > seenUpdates
         })
+        seenUpdates = updates.length
         const sent = image
         image = null
         recap = false
@@ -213,6 +228,11 @@ export class AgentRunnerService {
         bad = 0
         const tool = tools.find((entry) => entry.name === call.tool)!
         if (call.tool === 'done' || call.tool === 'fail') {
+          if (this.updates().length > seenUpdates) {
+            note =
+              'The user sent a new instruction before you finished. Read USER UPDATES and go on.'
+            continue
+          }
           const text = String(await tool.run(call.args, context))
           this.#record(
             records,

@@ -5,7 +5,8 @@ export const TOOL_STRINGS_AGENTS = {
   agentModeNotes: [
     'Describe the task, for example "Add the cheapest red shirt in size M to the cart".',
     'The assistant looks at the page, then clicks, types and scrolls. Each step is listed below.',
-    'It asks before it pays, sends, deletes, submits or leaves the page. Click Stop at any time.'
+    'It asks before it pays, sends, deletes, submits or leaves the page. Click Stop at any time.',
+    'While it works, send a message to correct it, change the task, or tell it how to get unstuck.'
   ],
   agentRunning: 'Working on the task…',
   agentSteps: 'Steps',
@@ -23,6 +24,10 @@ export const TOOL_STRINGS_AGENTS = {
   agentDeny: 'Deny',
   agentQuestion: 'The assistant asks: {question}',
   agentAnswerPlaceholder: 'Answer the assistant',
+  agentSteerPlaceholder: 'Add an instruction or a correction',
+  agentSteerHint:
+    'Type a message to correct or guide the assistant. It reads it at its next step.',
+  agentLatestUpdate: 'Your latest instruction: {text}',
   agentScreenAccess:
     'The browser may ask to share your screen so the assistant can see the page.',
   agentResultOk: 'ok',
