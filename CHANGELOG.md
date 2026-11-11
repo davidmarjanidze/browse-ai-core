@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-11
+
+### Added
+
+- Agent Mode (`features.agentMode`, off by default): does a task on the page step by step with clicks, typing, selects, keys, hover, scroll and waits, screenshots with element numbers, and questions to the user. Asks before risky steps. New `agent` config (`maxSteps`, `maxDurationMs`, `confirm`).
+- Watch Mode (`features.watchMode`, off by default): pick a part of the page and get a chat message when its text changes the way you asked. Checks every 15 seconds and keeps watching until Stop. New `watch` config (`intervalMs`, `threshold`).
+- "Agents" group in the Tools select, after Forms.
+- Events `agentStep`, `agentFinished` and `watchMatched` (React `onAgentStep`, `onAgentFinished`, `onWatchMatched`).
+- `responseConstraint` (JSON schema) in `AiRequestOptions`.
+- Strings for both tools, including `agentRiskWords`. Parts `agent-panel`, `watch-status`, `launcher-watching` and `launcher-unread`.
+
+### Changed
+
+- The element picker (DOM Element to Component) moves to the parent or child with Arrow Up / Arrow Down, and no longer picks `<body>` or `<html>`.
+
 ## [0.4.2] - 2026-11-07
 
 ### Changed
