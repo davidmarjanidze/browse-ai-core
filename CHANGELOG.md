@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-11
+
 ### Added
 
 - Agent Mode tools: open a link or address in a new tab, read the page text in parts, read a table, scroll inside a box, double-click, fill several fields at once, point out an element to the user, and save notes for later steps.
