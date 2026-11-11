@@ -100,9 +100,7 @@ export class BrowseAiCoreComponent {
   readonly themeStore = inject(ThemeStore)
   readonly t = this.#configStore.strings
   readonly layout = computed(() => this.#configStore.config().mode)
-  readonly resolvedPosition = computed(
-    () => this.#configStore.config().position
-  )
+  readonly resolvedPosition = this.themeStore.position
 
   readonly opened = output<void>()
   readonly closed = output<void>()

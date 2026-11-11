@@ -14,6 +14,19 @@
           (valueChange)="setTheme($event)"
         />
       </div>
+      @if (layout() !== 'inline') {
+        <div>
+          <p class="mb-2 text-sm font-semibold text-bac-text-muted">
+            {{ strings.chatSide }}
+          </p>
+          <bac-toggle-group
+            [ariaLabel]="strings.chatSide"
+            [options]="sideOptions()"
+            [value]="theme.side()"
+            (valueChange)="setSide($event)"
+          />
+        </div>
+      }
       <div>
         <p
           class="mb-2 text-sm font-semibold text-bac-text-muted"

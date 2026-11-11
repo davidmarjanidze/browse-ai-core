@@ -15,7 +15,7 @@ import {
 import { BookmarkService } from '../../bookmarks/bookmark.service'
 import { ConfigStore } from '../../core/config.store'
 import { SelectionActionsService } from '../../page/selection-actions.service'
-import { Personalization } from '../../core/storage-data'
+import { ChatSide, Personalization } from '../../core/storage-data'
 import { StorageService } from '../../core/storage.service'
 import { ThemeStore } from '../../core/theme.store'
 import { ToastService } from '../../core/toast.service'
@@ -45,6 +45,8 @@ export class SettingsPanelComponent {
   readonly #configStore = inject(ConfigStore)
   readonly t = this.#configStore.strings
   readonly features = this.#configStore.features
+  /** The side setting is hidden for inline chats, which have no side. */
+  readonly layout = computed(() => this.#configStore.config().mode)
   readonly nicknameMax = NICKNAME_MAX
   readonly instructionsMax = INSTRUCTIONS_MAX
 
@@ -62,6 +64,10 @@ export class SettingsPanelComponent {
     { label: this.t().themeDark, value: 'dark' },
     { label: this.t().themeSystem, value: 'system' }
   ])
+  readonly sideOptions = computed<ToggleOption<ChatSide>[]>(() => [
+    { label: this.t().chatSideLeft, value: 'left' },
+    { label: this.t().chatSideRight, value: 'right' }
+  ])
   readonly palettes = computed(() =>
     PALETTE_NAMES.map((name) => ({
       name,
@@ -77,6 +83,10 @@ export class SettingsPanelComponent {
 
   setTheme(theme: ThemeMode): void {
     this.theme.setTheme(theme)
+  }
+
+  setSide(side: ChatSide): void {
+    this.theme.setSide(side)
   }
 
   setPalette(palette: PaletteName): void {

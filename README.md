@@ -250,43 +250,43 @@ Angular use `[(open)]`, in Vue `v-model:open`, in React `open` with
 
 All of them are on by default, except `domToComponent` and `bookmarks`.
 
-| Name                   | Description                                                                                |
-| ---------------------- | ------------------------------------------------------------------------------------------ |
-| `pageContext`          | "Page / General" switch. When off, prompts never include the page.                         |
-| `imageInput`           | Upload an image from the attachment menu.                                                  |
-| `audioInput`           | Upload an audio file from the attachment menu.                                             |
-| `screenCapture`        | "Capture visible area" and "Snip and capture" in the attachment menu.                      |
-| `formFiller`           | Tool that suggests values for the form on the page. Each one can be accepted or not.       |
-| `tablesExtractor`      | Tool that reads the tables on the page and downloads them as CSV, Excel, JSON or Markdown. |
-| `domToComponent`       | Tool that turns an element you click on the page into Angular, React or Vue code.          |
-| `summarizer`           | Tool that summarizes text with Chrome's Summarizer API.                                    |
-| `translator`           | Tool that translates text with Chrome's Translator API, to a language picked in the chat.  |
-| `writer`               | Tool that writes text for a task with Chrome's Writer API.                                 |
-| `rewriter`             | Tool that rewrites text with Chrome's Rewriter API.                                        |
-| `proofreader`          | Tool that fixes grammar and spelling with Chrome's Proofreader API.                        |
-| `selectionActions`     | Summarize, Translate and other buttons next to text the user selects on the page.          |
-| `imageDownloader`      | Tool that checks the images on the screen for a subject and downloads the matches as zip.  |
-| `subjectFinder`        | Tool that finds the part of the page the user describes and scrolls to it.                 |
-| `bookmarks`            | Saves every page you open into a category picked by the model.                             |
-| `linkInspector`        | Tool that lists the page's links in groups and finds the link you ask for.                 |
-| `replyDrafter`         | Tool that drafts a reply for a text box on the page and puts it in after you accept it.    |
-| `notes`                | AI notes and highlights for each page, a "Save note" action and the Notes panel.           |
-| `reviewSummarizer`     | Tool that sums up the reviews on the page: pros, cons and a rating breakdown.              |
-| `researchNotes`        | Tool that saves pages into a topic and answers questions across them, with sources.        |
-| `argumentMapper`       | Tool that shows the main claim of a text with the points for and against it.               |
-| `formValidator`        | Tool that checks a form before it is sent and marks the problems on the page.              |
-| `voiceInput`           | Mic button in the composer. What you say becomes the message text.                         |
-| `dictation`            | Tool that types what you say into a text box on the page.                                  |
-| `performanceExplainer` | Tool that shows the page's speed numbers in live charts and explains them.                 |
-| `phishingCheck`        | Tool that looks for phishing and scam signs on the page and gives a risk level.            |
-| `darkPatternDetector`  | Tool that finds pre-checked extras, fake timers and similar tricks, and marks them.        |
-| `agentMode`            | Tool that does a task on the page step by step. See [Agent Mode](#agent-mode).             |
-| `watchMode`            | Tool that watches a part of the page for a text change. See [Watch Mode](#watch-mode).     |
-| `settings`             | Settings panel.                                                                            |
-| `personalization`      | Nickname and custom instructions in settings. They're added to every prompt.               |
-| `appearance`           | Theme and palette pickers in settings. The user's choice wins over `theme` and `palette`.  |
-| `markdown`             | Shows answers as Markdown. When off, answers are plain text.                               |
-| `contextUsage`         | Round badge in the header that shows how much of the model's memory is used.               |
+| Name                   | Description                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `pageContext`          | "Page / General" switch. When off, prompts never include the page.                                   |
+| `imageInput`           | Upload an image from the attachment menu.                                                            |
+| `audioInput`           | Upload an audio file from the attachment menu.                                                       |
+| `screenCapture`        | "Capture visible area" and "Snip and capture" in the attachment menu.                                |
+| `formFiller`           | Tool that suggests values for the form on the page. Each one can be accepted or not.                 |
+| `tablesExtractor`      | Tool that reads the tables on the page and downloads them as CSV, Excel, JSON or Markdown.           |
+| `domToComponent`       | Tool that turns an element you click on the page into Angular, React or Vue code.                    |
+| `summarizer`           | Tool that summarizes text with Chrome's Summarizer API.                                              |
+| `translator`           | Tool that translates text with Chrome's Translator API, to a language picked in the chat.            |
+| `writer`               | Tool that writes text for a task with Chrome's Writer API.                                           |
+| `rewriter`             | Tool that rewrites text with Chrome's Rewriter API.                                                  |
+| `proofreader`          | Tool that fixes grammar and spelling with Chrome's Proofreader API.                                  |
+| `selectionActions`     | Summarize, Translate and other buttons next to text the user selects on the page.                    |
+| `imageDownloader`      | Tool that checks the images on the screen for a subject and downloads the matches as zip.            |
+| `subjectFinder`        | Tool that finds the part of the page the user describes and scrolls to it.                           |
+| `bookmarks`            | Saves every page you open into a category picked by the model.                                       |
+| `linkInspector`        | Tool that lists the page's links in groups and finds the link you ask for.                           |
+| `replyDrafter`         | Tool that drafts a reply for a text box on the page and puts it in after you accept it.              |
+| `notes`                | AI notes and highlights for each page, a "Save note" action and the Notes panel.                     |
+| `reviewSummarizer`     | Tool that sums up the reviews on the page: pros, cons and a rating breakdown.                        |
+| `researchNotes`        | Tool that saves pages into a topic and answers questions across them, with sources.                  |
+| `argumentMapper`       | Tool that shows the main claim of a text with the points for and against it.                         |
+| `formValidator`        | Tool that checks a form before it is sent and marks the problems on the page.                        |
+| `voiceInput`           | Mic button in the composer. What you say becomes the message text.                                   |
+| `dictation`            | Tool that types what you say into a text box on the page.                                            |
+| `performanceExplainer` | Tool that shows the page's speed numbers in live charts and explains them.                           |
+| `phishingCheck`        | Tool that looks for phishing and scam signs on the page and gives a risk level.                      |
+| `darkPatternDetector`  | Tool that finds pre-checked extras, fake timers and similar tricks, and marks them.                  |
+| `agentMode`            | Tool that does a task on the page step by step. See [Agent Mode](#agent-mode).                       |
+| `watchMode`            | Tool that watches a part of the page for a text change. See [Watch Mode](#watch-mode).               |
+| `settings`             | Settings panel.                                                                                      |
+| `personalization`      | Nickname and custom instructions in settings. They're added to every prompt.                         |
+| `appearance`           | Theme, palette and side (left or right) pickers in settings. The user's choice wins over the config. |
+| `markdown`             | Shows answers as Markdown. When off, answers are plain text.                                         |
+| `contextUsage`         | Round badge in the header that shows how much of the model's memory is used.                         |
 
 ```js
 chat.config = {
@@ -306,6 +306,13 @@ tool is picked, a green "How to use" box shows its steps.
 `theme: 'system'` follows `prefers-color-scheme`. Use `'light'` or `'dark'` to
 fix it. If `features.appearance` is on, users can change it in settings and
 their choice is saved.
+
+### Left or right
+
+With `features.appearance` on, users can also move the chat to the left or
+right side of the window in settings (Position). It keeps the top or bottom
+from `position`, and in `drawer` mode the panel opens on that side. The
+choice is saved and wins over `position`. Inline chats don't show it.
 
 ### Palettes
 
@@ -625,6 +632,18 @@ The input stays open while it works. Send a message at any time to correct the
 task, change direction, or tell it how to get past a step where it is stuck.
 It reads the message at its next step and follows the newest instruction. If
 it was about to finish, it goes on with your instruction instead.
+
+It can also open a link or an address in a new tab (the run goes on in this
+tab), read the page's text in parts, read a table, scroll inside a list or a
+dialog, double-click, fill several fields in one step, point out an element
+to you with a message in the chat, and save short notes for itself (they are
+sent with every later step, so it doesn't forget prices or names it found).
+
+In a browser extension, new tabs are opened by the background worker: it gets
+`{ type: 'OPEN_TAB', url, active }` (`OPEN_TAB_MESSAGE`) and should open the
+tab with `chrome.tabs.create` and answer `{ ok: true }`. On a normal web page
+the chat uses `window.open`; when the browser's pop-up blocker stops it, the
+link is posted in the chat instead.
 
 It asks before it clicks a submit button, a button whose name contains a word
 like buy, pay, order, delete, send or confirm (`agentRiskWords` in `strings`),

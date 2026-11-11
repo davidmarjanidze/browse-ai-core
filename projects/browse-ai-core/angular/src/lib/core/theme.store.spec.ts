@@ -40,4 +40,26 @@ describe('ThemeStore', () => {
     TestBed.inject(ConfigStore).connect(input)
     expect(theme.mode()).toBe('light')
   })
+
+  it('moves the chat to the saved side and keeps top or bottom', async () => {
+    const storage = memoryStorageAdapter()
+    const theme = setup({ position: 'top-right', storage })
+    expect(theme.side()).toBe('right')
+    theme.setSide('left')
+    expect(theme.position()).toBe('top-left')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    TestBed.resetTestingModule()
+    const reloaded = setup({ position: 'bottom-right', storage })
+    await reloaded.init()
+    expect(reloaded.position()).toBe('bottom-left')
+  })
+
+  it('ignores the saved side when appearance is turned off', () => {
+    const theme = setup({
+      position: 'bottom-right',
+      features: { appearance: false }
+    })
+    theme.setSide('left')
+    expect(theme.position()).toBe('bottom-right')
+  })
 })

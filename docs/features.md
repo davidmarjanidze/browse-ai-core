@@ -4,43 +4,43 @@ Each feature can be turned on or off with `features.<name>` in the config.
 The table shows the default and where the code is (paths under
 `projects/browse-ai-core/angular/src/lib/`).
 
-| Feature                   | Option                 | Default | Code                                                                      |
-| ------------------------- | ---------------------- | ------- | ------------------------------------------------------------------------- |
-| Page / General switch     | `pageContext`          | on      | `page/`, `components/composer/`                                           |
-| Image upload              | `imageInput`           | on      | `components/composer/`                                                    |
-| Audio upload              | `audioInput`           | on      | `components/composer/`                                                    |
-| Screenshots               | `screenCapture`        | on      | `page/snip-capture.service.ts`, `page/region-selector.ts`                 |
-| Form Filler               | `formFiller`           | on      | `tools/form-filler/`                                                      |
-| Tables Extractor          | `tablesExtractor`      | on      | `tools/tables/`                                                           |
-| DOM Element to Component  | `domToComponent`       | off     | `tools/dom-to-component/`                                                 |
-| Summarizer                | `summarizer`           | on      | `ai/built-in/`                                                            |
-| Translator                | `translator`           | on      | `ai/built-in/`, `components/composer/`                                    |
-| Writer                    | `writer`               | on      | `ai/built-in/`                                                            |
-| Rewriter                  | `rewriter`             | on      | `ai/built-in/`                                                            |
-| Proofreader               | `proofreader`          | on      | `ai/built-in/`                                                            |
-| Selection actions         | `selectionActions`     | on      | `page/selection-actions.service.ts`, `components/selection-actions/`      |
-| Image Downloader          | `imageDownloader`      | on      | `tools/image-downloader/`                                                 |
-| Subject Finder            | `subjectFinder`        | on      | `tools/subject-finder/`                                                   |
-| AI bookmarks              | `bookmarks`            | off     | `bookmarks/`, `components/bookmarks/`                                     |
-| Link Inspector            | `linkInspector`        | on      | `tools/link-inspector/`                                                   |
-| Reply Drafter             | `replyDrafter`         | on      | `tools/reply-drafter/`, `page/field-tracker.service.ts`                   |
-| Notes and Notes panel     | `notes`                | on      | `tools/notes/`, `components/notes/`, `core/notes-data.ts`                 |
-| Review Summarizer         | `reviewSummarizer`     | on      | `tools/review-summarizer/`                                                |
-| Research Notes            | `researchNotes`        | on      | `tools/research/`, `core/research-data.ts`                                |
-| Argument Mapper           | `argumentMapper`       | on      | `tools/argument-mapper/`                                                  |
-| Form Validator            | `formValidator`        | on      | `tools/form-validator/`, `page/marker-layer.ts`                           |
-| Mic button                | `voiceInput`           | on      | `chat/voice-input.store.ts`, `components/composer/voice-bar.component.ts` |
-| Dictation                 | `dictation`            | on      | `tools/dictation/`                                                        |
-| Performance Explainer     | `performanceExplainer` | on      | `tools/performance/`, `ui/charts/`                                        |
-| Scam Check                | `phishingCheck`        | on      | `tools/phishing-check/`                                                   |
-| Dark Pattern Detector     | `darkPatternDetector`  | on      | `tools/dark-patterns/`, `page/marker-layer.ts`                            |
-| Agent Mode                | `agentMode`            | on      | `tools/agent/`, `components/agents/agent-panel.component.ts`              |
-| Watch Mode                | `watchMode`            | on      | `tools/watch/`, `components/agents/watch-panel.component.ts`              |
-| Settings panel            | `settings`             | on      | `components/settings/`                                                    |
-| Personalization           | `personalization`      | on      | `components/settings/`, `ai/prompt-builder.ts`                            |
-| Theme and palette pickers | `appearance`           | on      | `components/settings/`, `core/theme.store.ts`                             |
-| Markdown answers          | `markdown`             | on      | `core/markdown.pipe.ts`, `styles/markdown.css`                            |
-| Chat memory badge         | `contextUsage`         | on      | `components/header/`, `ai/ai.service.ts`                                  |
+| Feature                  | Option                 | Default | Code                                                                      |
+| ------------------------ | ---------------------- | ------- | ------------------------------------------------------------------------- |
+| Page / General switch    | `pageContext`          | on      | `page/`, `components/composer/`                                           |
+| Image upload             | `imageInput`           | on      | `components/composer/`                                                    |
+| Audio upload             | `audioInput`           | on      | `components/composer/`                                                    |
+| Screenshots              | `screenCapture`        | on      | `page/snip-capture.service.ts`, `page/region-selector.ts`                 |
+| Form Filler              | `formFiller`           | on      | `tools/form-filler/`                                                      |
+| Tables Extractor         | `tablesExtractor`      | on      | `tools/tables/`                                                           |
+| DOM Element to Component | `domToComponent`       | off     | `tools/dom-to-component/`                                                 |
+| Summarizer               | `summarizer`           | on      | `ai/built-in/`                                                            |
+| Translator               | `translator`           | on      | `ai/built-in/`, `components/composer/`                                    |
+| Writer                   | `writer`               | on      | `ai/built-in/`                                                            |
+| Rewriter                 | `rewriter`             | on      | `ai/built-in/`                                                            |
+| Proofreader              | `proofreader`          | on      | `ai/built-in/`                                                            |
+| Selection actions        | `selectionActions`     | on      | `page/selection-actions.service.ts`, `components/selection-actions/`      |
+| Image Downloader         | `imageDownloader`      | on      | `tools/image-downloader/`                                                 |
+| Subject Finder           | `subjectFinder`        | on      | `tools/subject-finder/`                                                   |
+| AI bookmarks             | `bookmarks`            | off     | `bookmarks/`, `components/bookmarks/`                                     |
+| Link Inspector           | `linkInspector`        | on      | `tools/link-inspector/`                                                   |
+| Reply Drafter            | `replyDrafter`         | on      | `tools/reply-drafter/`, `page/field-tracker.service.ts`                   |
+| Notes and Notes panel    | `notes`                | on      | `tools/notes/`, `components/notes/`, `core/notes-data.ts`                 |
+| Review Summarizer        | `reviewSummarizer`     | on      | `tools/review-summarizer/`                                                |
+| Research Notes           | `researchNotes`        | on      | `tools/research/`, `core/research-data.ts`                                |
+| Argument Mapper          | `argumentMapper`       | on      | `tools/argument-mapper/`                                                  |
+| Form Validator           | `formValidator`        | on      | `tools/form-validator/`, `page/marker-layer.ts`                           |
+| Mic button               | `voiceInput`           | on      | `chat/voice-input.store.ts`, `components/composer/voice-bar.component.ts` |
+| Dictation                | `dictation`            | on      | `tools/dictation/`                                                        |
+| Performance Explainer    | `performanceExplainer` | on      | `tools/performance/`, `ui/charts/`                                        |
+| Scam Check               | `phishingCheck`        | on      | `tools/phishing-check/`                                                   |
+| Dark Pattern Detector    | `darkPatternDetector`  | on      | `tools/dark-patterns/`, `page/marker-layer.ts`                            |
+| Agent Mode               | `agentMode`            | on      | `tools/agent/`, `components/agents/agent-panel.component.ts`              |
+| Watch Mode               | `watchMode`            | on      | `tools/watch/`, `components/agents/watch-panel.component.ts`              |
+| Settings panel           | `settings`             | on      | `components/settings/`                                                    |
+| Personalization          | `personalization`      | on      | `components/settings/`, `ai/prompt-builder.ts`                            |
+| Theme, palette, side     | `appearance`           | on      | `components/settings/`, `core/theme.store.ts`                             |
+| Markdown answers         | `markdown`             | on      | `core/markdown.pipe.ts`, `styles/markdown.css`                            |
+| Chat memory badge        | `contextUsage`         | on      | `components/header/`, `ai/ai.service.ts`                                  |
 
 ## Always on
 
@@ -177,7 +177,11 @@ its tools are on. Each tool shows a green "How to use" box with its steps
   `agent.maxDurationMs`, 3 bad answers in a row. Messages sent during a run
   go to `steer()` and are listed as USER UPDATES in every later step prompt
   (newest 5); a `done` or `fail` that arrives before the model saw a new
-  update is ignored and the loop goes on. When the model session is
+  update is ignored and the loop goes on. More tools (T-009) are in
+  `agent-tools-more.ts`: `open_in_new_tab` (background worker message
+  `OPEN_TAB`, else `window.open`, else the link is posted in the chat),
+  `read_page_text`, `read_table`, `scroll_inside`, `double_click`,
+  `fill_form`, `show_user` and `remember` (notes sent with every step). When the model session is
   75% full, a new one starts with a recap of the steps.
 - **Watch Mode** (spec T-002). The element is picked with the same picker as
   DOM Element to Component (Arrow Up / Down for parent / child). A timer
@@ -230,10 +234,12 @@ don't overwrite each other.
 
 ## Settings
 
-- Appearance: theme (light, dark, system) and palette.
+- Appearance: theme (light, dark, system), palette, and side (left or
+  right; not shown for inline chats).
 - Personalization: nickname and custom instructions, added to every
   conversation.
 - AI bookmarks switch (when the feature is on).
 - Actions on selected text switch (when the feature is on). On by default.
 
-Saved settings win over the theme and palette from the config.
+Saved settings win over the theme, palette and side of `position` from the
+config (`ThemeStore.position`).

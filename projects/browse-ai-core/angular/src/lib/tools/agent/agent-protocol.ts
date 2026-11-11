@@ -16,6 +16,8 @@ export interface AgentStepRecord {
   result: string
 }
 
+/** Saved notes kept in each prompt. */
+export const MAX_MEMORY = 10
 /** User updates kept in each prompt. */
 export const MAX_UPDATES = 5
 /** Steps kept in full when the history is sent again. */
@@ -94,6 +96,8 @@ export function buildStepPrompt(options: {
   updates?: string[]
   /** The newest update was not sent to the model yet. */
   newUpdate?: boolean
+  /** Notes the agent saved with `remember`. */
+  memory?: string[]
 }): string {
   const { task, page, steps, recap, note, hasImage } = options
   const updates = (options.updates ?? []).slice(-MAX_UPDATES)
@@ -119,6 +123,12 @@ export function buildStepPrompt(options: {
             : [])
         ]
       : []),
+    ...(options.memory?.length
+      ? [
+          'YOUR SAVED NOTES:',
+          ...options.memory.slice(-MAX_MEMORY).map((entry) => `- ${entry}`)
+        ]
+      : []),
     ...(note ? [`NOTE: ${note}`] : []),
     ...(hasImage
       ? [
@@ -138,6 +148,11 @@ function checkType(value: unknown, type: string): boolean {
       (typeof value === 'string' &&
         value.trim() !== '' &&
         Number.isFinite(Number(value)))
+    )
+  if (type === 'object')
+    return (
+      (typeof value === 'object' && !Array.isArray(value)) ||
+      (typeof value === 'string' && value.trim().startsWith('{'))
     )
   return typeof value === type
 }

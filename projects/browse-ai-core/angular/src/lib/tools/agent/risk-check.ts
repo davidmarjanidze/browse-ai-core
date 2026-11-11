@@ -71,7 +71,10 @@ export function riskOf(
     'press_key',
     'select_option',
     'set_checked',
-    'go_back'
+    'go_back',
+    'double_click',
+    'fill_form',
+    'open_in_new_tab'
   ].includes(action)
   if (!changes) return null
   if (action === 'go_back') return mode === 'never' ? null : 'navigate'
@@ -79,7 +82,8 @@ export function riskOf(
   if (mode === 'always') return 'always'
   if (!element) return null
 
-  const clicks = action === 'click' || action === 'set_checked'
+  const clicks =
+    action === 'click' || action === 'double_click' || action === 'set_checked'
   if (clicks && isNavigatingLink(element, doc)) return 'navigate'
   if (clicks && isSubmitButton(element)) return 'submit'
   if (action === 'press_key' || action === 'type_text') {

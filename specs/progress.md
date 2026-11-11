@@ -25,4 +25,10 @@ Quick track T-008 (2026-11-11, from the user): Agent Mode takes new
 instructions while it runs. Messages sent during a run go to the agent as
 USER UPDATES at its next step. Shipped in 0.6.0.
 
+Quick track T-009 (2026-11-11, from the user): more Agent Mode tools, with
+`open_in_new_tab` first. Done, in `Unreleased`.
+
+Quick track T-010 (2026-11-11, from the user): left / right Position in
+settings, saved with the appearance. Done, in `Unreleased`.
+
 Next step: T-003 (run the demo in Chrome with the built-in model).

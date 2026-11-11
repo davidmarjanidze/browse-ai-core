@@ -17,79 +17,23 @@ import {
   walkElements
 } from './page-snapshot'
 import { sleep, waitFor, waitForIdle } from './page-waits'
+import {
+  AgentTool,
+  AgentToolContext,
+  DEFAULT_WAIT_FOR_MS,
+  MAX_QUERY,
+  MAX_READ,
+  MAX_WAIT_FOR_MS,
+  MAX_WAIT_MS,
+  clamp,
+  ref,
+  target,
+  text
+} from './agent-tool-base'
+import { MORE_AGENT_TOOLS } from './agent-tools-more'
 
-export interface AgentToolContext {
-  doc: Document
-  host: HTMLElement | null
-  refs: RefMap
-  signal: AbortSignal
-  /** Takes a screenshot that is sent with the next step. */
-  screenshot: () => Promise<void>
-  /** Shows a question and resolves with the user's answer. */
-  askUser: (question: string) => Promise<string>
-}
-
-type ArgType = 'string' | 'number' | 'boolean'
-
-export interface AgentArg {
-  type: ArgType
-  description: string
-  optional?: boolean
-  enum?: readonly string[]
-}
-
-export interface AgentTool {
-  name: string
-  description: string
-  args: Record<string, AgentArg>
-  /** Acts on the page; the runner waits for the page to settle after it. */
-  changesPage?: boolean
-  run: (
-    args: Record<string, unknown>,
-    context: AgentToolContext
-  ) => Promise<string> | string
-}
-
-export const MAX_WAIT_MS = 10_000
-export const MAX_WAIT_FOR_MS = 30_000
-const DEFAULT_WAIT_FOR_MS = 5_000
-const MAX_QUERY = 20
-const MAX_READ = 2_000
-
-const ref: AgentArg = {
-  type: 'number',
-  description: 'element number from ELEMENTS'
-}
-
-/** The element for `args.ref`, or an error the model can act on. */
-export function target(
-  args: Record<string, unknown>,
-  context: AgentToolContext
-): Element {
-  const element = context.refs.get(Number(args['ref']))
-  if (!element)
-    throw new ActionError(
-      `Element ${String(args['ref'])} is gone or unknown. Use the latest ELEMENTS list.`
-    )
-  if (isOffLimits(element, context.host))
-    throw new ActionError(
-      'This element is off limits (password, card or the chat).'
-    )
-  return element
-}
-
-const text = (value: unknown, max = 120): string =>
-  String(value ?? '')
-    .replace(/\s+/gu, ' ')
-    .trim()
-    .slice(0, max)
-
-const clamp = (value: unknown, fallback: number, max: number): number => {
-  const number = Number(value)
-  return Number.isFinite(number) && number > 0
-    ? Math.min(number, max)
-    : fallback
-}
+export type { AgentArg, AgentTool, AgentToolContext } from './agent-tool-base'
+export { MAX_WAIT_FOR_MS, MAX_WAIT_MS, target } from './agent-tool-base'
 
 function query(
   context: AgentToolContext,
@@ -356,6 +300,7 @@ export const AGENT_TOOLS: readonly AgentTool[] = [
       return 'Went back.'
     }
   },
+  ...MORE_AGENT_TOOLS,
   {
     name: 'wait',
     description: `Wait some milliseconds (up to ${MAX_WAIT_MS}).`,

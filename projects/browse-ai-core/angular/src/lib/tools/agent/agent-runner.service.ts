@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common'
 import { DestroyRef, Injectable, inject, signal } from '@angular/core'
 import {
   AiPromptInput,
+  openInNewTab,
   AiSession,
   formatString,
   getSessionOptions
@@ -128,6 +129,7 @@ export class AgentRunnerService {
     const tools = agentTools(withScreens)
     const refs = new RefMap()
     const records: AgentStepRecord[] = []
+    const memory: string[] = []
     const abort = new AbortController()
     const stopOuter = (): void => abort.abort()
     request.signal.addEventListener('abort', stopOuter, { once: true })
@@ -153,7 +155,10 @@ export class AgentRunnerService {
         )
         image = await shrinkImage(dataUrl)
       },
-      askUser: (question) => this.#ask(question, abort.signal)
+      askUser: (question) => this.#ask(question, abort.signal),
+      notify: (text) => this.#notices.post(text),
+      remember: (note) => memory.push(note),
+      openTab: (url, active) => openInNewTab(url, active)
     }
 
     this.steps.set([])
@@ -189,7 +194,8 @@ export class AgentRunnerService {
           note,
           hasImage: image !== null,
           updates,
-          newUpdate: updates.length > seenUpdates
+          newUpdate: updates.length > seenUpdates,
+          memory
         })
         seenUpdates = updates.length
         const sent = image
@@ -390,6 +396,7 @@ export class AgentRunnerService {
   #argsLabel(call: AgentCall): string {
     const value =
       call.args['text'] ??
+      call.args['url'] ??
       call.args['selector'] ??
       call.args['key'] ??
       call.args['direction'] ??

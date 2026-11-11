@@ -15,9 +15,13 @@ export interface BookmarkRecord {
 /** Category name to the pages saved in it, newest first. */
 export type Bookmarks = Record<string, BookmarkRecord[]>
 
+/** Side of the window the launcher and panel sit on. */
+export type ChatSide = 'left' | 'right'
+
 export interface Appearance {
   theme?: ThemeMode
   palette?: PaletteName
+  side?: ChatSide
 }
 
 export interface Preferences {
@@ -92,7 +96,10 @@ function normalizeAppearance(value: unknown): Appearance {
     ...(theme === 'light' || theme === 'dark' || theme === 'system'
       ? { theme }
       : {}),
-    ...(isPaletteName(value['palette']) ? { palette: value['palette'] } : {})
+    ...(isPaletteName(value['palette']) ? { palette: value['palette'] } : {}),
+    ...(value['side'] === 'left' || value['side'] === 'right'
+      ? { side: value['side'] }
+      : {})
   }
 }
 

@@ -1,15 +1,17 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import {
+  ChatPosition,
   ColorMode,
   PaletteName,
   ThemeMode,
   buildThemeCss
 } from 'browse-ai-core'
 import { ConfigStore } from './config.store'
+import { ChatSide } from './storage-data'
 import { StorageService } from './storage.service'
 
 /**
- * Resolves the theme mode and palette. A choice the user saved in settings
+ * Resolves the theme mode, palette and side. A choice the user saved in settings
  * wins over the config, as long as the appearance feature is on.
  */
 @Injectable()
@@ -18,6 +20,7 @@ export class ThemeStore {
   readonly #storage = inject(StorageService)
   readonly #savedTheme = signal<ThemeMode | undefined>(undefined)
   readonly #savedPalette = signal<PaletteName | undefined>(undefined)
+  readonly #savedSide = signal<ChatSide | undefined>(undefined)
   readonly #systemDark = signal(false)
 
   readonly theme = computed<ThemeMode>(() => {
@@ -28,6 +31,16 @@ export class ThemeStore {
     const { palette, features } = this.#configStore.config()
     return (features.appearance && this.#savedPalette()) || palette
   })
+  /** The configured corner, moved to the side the user saved in settings. */
+  readonly position = computed<ChatPosition>(() => {
+    const { position, features } = this.#configStore.config()
+    const side = features.appearance ? this.#savedSide() : undefined
+    if (!side) return position
+    return `${position.startsWith('top') ? 'top' : 'bottom'}-${side}`
+  })
+  readonly side = computed<ChatSide>(() =>
+    this.position().endsWith('left') ? 'left' : 'right'
+  )
   readonly mode = computed<ColorMode>(() => {
     const theme = this.theme()
     if (theme !== 'system') return theme
@@ -52,6 +65,12 @@ export class ThemeStore {
     const appearance = await this.#storage.loadAppearance()
     this.#savedTheme.set(appearance.theme)
     this.#savedPalette.set(appearance.palette)
+    this.#savedSide.set(appearance.side)
+  }
+
+  setSide(side: ChatSide): void {
+    this.#savedSide.set(side)
+    void this.#storage.setAppearance({ side })
   }
 
   setTheme(theme: ThemeMode): void {
