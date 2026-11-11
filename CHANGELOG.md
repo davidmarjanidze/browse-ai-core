@@ -5,6 +5,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-11
+
+### Changed
+
+- Agent Mode and Watch Mode are listed in the Tools select by default (`agentMode` and `watchMode` default to `true`). They only act after the user picks one and sends. Set them to `false` to hide them.
+
 ## [0.5.0] - 2026-11-11
 
 ### Added
