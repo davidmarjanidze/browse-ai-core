@@ -1,6 +1,6 @@
 {
   "name": "browse-ai-core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "AI chat assistant for web pages, running on the browser's built-in model. Works with Angular, React, Vue and plain HTML.",
   "author": "David Marjanidze",
   "license": "MIT",

@@ -34,8 +34,8 @@ The table shows the default and where the code is (paths under
 | Performance Explainer     | `performanceExplainer` | on      | `tools/performance/`, `ui/charts/`                                        |
 | Scam Check                | `phishingCheck`        | on      | `tools/phishing-check/`                                                   |
 | Dark Pattern Detector     | `darkPatternDetector`  | on      | `tools/dark-patterns/`, `page/marker-layer.ts`                            |
-| Agent Mode                | `agentMode`            | off     | `tools/agent/`, `components/agents/agent-panel.component.ts`              |
-| Watch Mode                | `watchMode`            | off     | `tools/watch/`, `components/agents/watch-panel.component.ts`              |
+| Agent Mode                | `agentMode`            | on      | `tools/agent/`, `components/agents/agent-panel.component.ts`              |
+| Watch Mode                | `watchMode`            | on      | `tools/watch/`, `components/agents/watch-panel.component.ts`              |
 | Settings panel            | `settings`             | on      | `components/settings/`                                                    |
 | Personalization           | `personalization`      | on      | `components/settings/`, `ai/prompt-builder.ts`                            |
 | Theme and palette pickers | `appearance`           | on      | `components/settings/`, `core/theme.store.ts`                             |

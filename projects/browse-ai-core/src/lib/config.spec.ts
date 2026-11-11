@@ -86,10 +86,10 @@ describe('defaultContextMode', () => {
 })
 
 describe('agent and watch options', () => {
-  it('uses defaults and keeps both modes off', () => {
+  it('uses defaults and lists both modes', () => {
     const config = resolveConfig()
-    expect(config.features.agentMode).toBe(false)
-    expect(config.features.watchMode).toBe(false)
+    expect(config.features.agentMode).toBe(true)
+    expect(config.features.watchMode).toBe(true)
     expect(config.agent).toEqual({
       maxSteps: 25,
       maxDurationMs: 300_000,

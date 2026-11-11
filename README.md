@@ -16,7 +16,7 @@ page it's on, reads images and audio, and takes spoken questions. It also has
 tools to work with the page:
 
 - Forms: fill a form from your text, or check it before it is sent.
-- Agents (off by default): do a task on the page step by step (clicks,
+- Agents: do a task on the page step by step (clicks,
   typing, scrolling), or watch a part of the page and tell you when its text
   changes the way you asked.
 - Reading: summarize, translate, find a part of the page or a link, map the
@@ -248,8 +248,7 @@ Angular use `[(open)]`, in Vue `v-model:open`, in React `open` with
 
 ### Features
 
-All of them are on by default, except `domToComponent`, `bookmarks`,
-`agentMode` and `watchMode`.
+All of them are on by default, except `domToComponent` and `bookmarks`.
 
 | Name                   | Description                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------ |
@@ -611,8 +610,7 @@ provider. Recordings stop after 60 seconds and are not saved.
 
 ## Agent Mode
 
-Turn it on with `features: { agentMode: true }`. Pick Agent Mode under
-Agents in the Tools select and describe a task, for example "Add the cheapest
+Pick Agent Mode under Agents in the Tools select and describe a task, for example "Add the cheapest
 red shirt in size M to the cart".
 
 The assistant works in steps. Each step it reads the visible buttons, links
@@ -630,7 +628,6 @@ code fields. Stop ends the run at any time.
 
 ```js
 chat.config = {
-  features: { agentMode: true },
   agent: {
     maxSteps: 25, // default
     maxDurationMs: 300000, // default, 5 minutes
@@ -639,14 +636,16 @@ chat.config = {
 }
 ```
 
-The run ends when the page loads a new address. Screenshots need the
+Nothing runs until the user picks the tool and sends a task. To hide it from
+the Tools select, set `features: { agentMode: false }`. The run ends when the
+page loads a new address. Screenshots need the
 `screenCapture` adapter and a model that accepts images; without them the
 assistant works from the element list only. A small model such as Gemini Nano
 can lose track in long tasks, so short, clear tasks work best.
 
 ## Watch Mode
 
-Turn it on with `features: { watchMode: true }`. Pick Watch Mode under Agents,
+Pick Watch Mode under Agents,
 click Select element and click the part of the page to watch, like a price or
 an order status. While picking, Arrow Up and Arrow Down move to the parent or
 child element, and Esc cancels. Then describe what to look for, for example
@@ -661,7 +660,6 @@ panel is closed. Watching goes on until you click Stop.
 
 ```js
 chat.config = {
-  features: { watchMode: true },
   watch: {
     intervalMs: 15000, // default, at least 5000
     threshold: 0.7 // default, 0 to 1
@@ -669,7 +667,8 @@ chat.config = {
 }
 ```
 
-If the page draws the element again (common in React, Vue and Angular apps),
+Nothing is watched until the user starts a watch. To hide the tool, set
+`features: { watchMode: false }`. If the page draws the element again (common in React, Vue and Angular apps),
 it is found again by its id, test id or position. Browsers slow down timers in
 background tabs, so checks can be late there. One element is watched per chat
 at a time.

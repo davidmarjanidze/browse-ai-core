@@ -16,4 +16,9 @@ T-001 (Agent Mode) and T-002 (Watch Mode) shipped in 0.5.0 and are in
 `completed/`. ADR 0001 is accepted. Both were checked with automated tests
 only; the check with the real Gemini Nano model is T-003 in the backlog.
 
+Quick track T-007 (2026-11-11, from the user): Agent Mode and Watch Mode are
+listed in Tools by default (`agentMode` / `watchMode` default `true`); they
+only act after the user picks one and sends. Shipped in 0.5.1. This replaces
+the "Default: off" in T-001 R1.1 and T-002 R1.1.
+
 Next step: T-003 (run the demo in Chrome with the built-in model).

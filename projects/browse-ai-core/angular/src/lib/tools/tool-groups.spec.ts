@@ -58,12 +58,18 @@ describe('tool groups', () => {
     ])
   })
 
-  it('keeps Agent Mode and Watch Mode off by default', () => {
+  it('lists Agent Mode and Watch Mode by default, until turned off', () => {
     const ids = getTools(DEFAULT_FEATURES, DEFAULT_STRINGS).map(
       (tool) => tool.id
     )
-    expect(ids).not.toContain('agent-mode')
-    expect(ids).not.toContain('watch-mode')
+    expect(ids).toContain('agent-mode')
+    expect(ids).toContain('watch-mode')
+    const off = getTools(
+      { ...DEFAULT_FEATURES, agentMode: false, watchMode: false },
+      DEFAULT_STRINGS
+    ).map((tool) => tool.id)
+    expect(off).not.toContain('agent-mode')
+    expect(off).not.toContain('watch-mode')
   })
 
   it('drops headings of groups with no tools turned on', () => {

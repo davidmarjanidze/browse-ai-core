@@ -20,7 +20,7 @@ async function setup(config = {}) {
   return session
 }
 
-/** Agent Mode and Watch Mode are off by default. */
+/** Turns on every tool that can be turned off. */
 const ALL_ON = { features: { agentMode: true, watchMode: true } }
 
 describe('newer tools', () => {
