@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-11
+
 ### Added
 
 - Agent Mode: the input stays open during a run. Messages sent while it works correct or change the task, or help it get unstuck; the agent reads them at its next step. New strings `agentSteerPlaceholder`, `agentSteerHint` and `agentLatestUpdate`, and a fourth `agentModeNotes` step.

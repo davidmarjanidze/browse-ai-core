@@ -23,6 +23,6 @@ the "Default: off" in T-001 R1.1 and T-002 R1.1.
 
 Quick track T-008 (2026-11-11, from the user): Agent Mode takes new
 instructions while it runs. Messages sent during a run go to the agent as
-USER UPDATES at its next step. Done, not released yet (in `Unreleased`).
+USER UPDATES at its next step. Shipped in 0.6.0.
 
 Next step: T-003 (run the demo in Chrome with the built-in model).
