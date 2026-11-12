@@ -241,3 +241,95 @@ export function scrollPage(
         : scrollY >= max - 2
   }
 }
+
+/** Value formats for inputs that `setValue` fills. */
+const VALUE_FORMATS: Record<string, { pattern: RegExp; example: string }> = {
+  date: { pattern: /^\d{4}-\d{2}-\d{2}$/u, example: '2026-03-31' },
+  time: { pattern: /^\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?$/u, example: '14:30' },
+  'datetime-local': {
+    pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/u,
+    example: '2026-03-31T14:30'
+  },
+  month: { pattern: /^\d{4}-\d{2}$/u, example: '2026-03' },
+  week: { pattern: /^\d{4}-W\d{2}$/u, example: '2026-W13' },
+  color: { pattern: /^#[0-9a-f]{6}$/iu, example: '#ff8800' }
+}
+
+/** Sets an input's value with the native setter, then fires input and change. */
+function setNativeValue(element: HTMLInputElement, value: string): void {
+  const proto = Object.getPrototypeOf(element) as object
+  const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
+  if (setter) setter.call(element, value)
+  else element.value = value
+  element.dispatchEvent(new Event('input', { bubbles: true }))
+  element.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
+/** A range value moved inside min / max and onto the nearest step. */
+function rangeValue(element: HTMLInputElement, wanted: string): string {
+  const number = Number(wanted)
+  if (!Number.isFinite(number))
+    throw new ActionError(`"${wanted}" is not a number.`)
+  const min = Number(element.min || 0)
+  const max = Number(element.max || 100)
+  const step = element.step === 'any' ? 0 : Number(element.step || 1) || 1
+  const stepped = step ? min + Math.round((number - min) / step) * step : number
+  return String(Math.min(max, Math.max(min, stepped)))
+}
+
+/**
+ * Sets a date, time, range or color input. Returns the value the input has
+ * now, and whether a range value was moved to fit.
+ */
+export function setValue(element: Element, wanted: string): string {
+  const type = element instanceof HTMLInputElement ? element.type : ''
+  if (type !== 'range' && !VALUE_FORMATS[type])
+    throw new ActionError(
+      'Use type_text for text fields or select_option for lists.'
+    )
+  const input = element as HTMLInputElement
+  if (input.disabled || input.readOnly)
+    throw new ActionError('The field is disabled.')
+  let value = wanted.trim()
+  if (type === 'datetime-local') value = value.replace(' ', 'T')
+  if (type === 'color' && /^#[0-9a-f]{3}$/iu.test(value))
+    value = `#${[...value.slice(1)].map((digit) => digit + digit).join('')}`
+  if (type === 'range') value = rangeValue(input, value)
+  else if (!VALUE_FORMATS[type].pattern.test(value))
+    throw new ActionError(
+      `"${wanted}" is not a valid ${type}. Use the form ${VALUE_FORMATS[type].example}.`
+    )
+  bringIntoView(input)
+  input.focus?.({ preventScroll: true })
+  setNativeValue(input, value)
+  if (!input.value)
+    throw new ActionError(`The field did not take "${value}" (out of range?).`)
+  const moved =
+    type === 'range' && Number(input.value) !== Number(wanted)
+      ? ` (moved from ${wanted} to fit min ${input.min || 0}, max ${input.max || 100}, step ${input.step || 1})`
+      : ''
+  return `${input.value}${moved}`
+}
+
+/** Right button down, context menu, up, as a mouse would. */
+export function rightClickElement(element: Element): void {
+  bringIntoView(element)
+  const View = view(element)
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    button: 2,
+    buttons: 2,
+    ...center(element)
+  }
+  const pointerEvent = (type: string): Event =>
+    typeof View.PointerEvent === 'function'
+      ? new View.PointerEvent(type, { ...init, pointerType: 'mouse' })
+      : new View.MouseEvent(type.replace('pointer', 'mouse'), init)
+  element.dispatchEvent(pointerEvent('pointerdown'))
+  element.dispatchEvent(new View.MouseEvent('mousedown', init))
+  element.dispatchEvent(new View.MouseEvent('contextmenu', init))
+  element.dispatchEvent(pointerEvent('pointerup'))
+  element.dispatchEvent(new View.MouseEvent('mouseup', { ...init, buttons: 0 }))
+}

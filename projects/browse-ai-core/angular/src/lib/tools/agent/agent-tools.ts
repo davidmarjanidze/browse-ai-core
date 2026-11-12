@@ -30,6 +30,7 @@ import {
   target,
   text
 } from './agent-tool-base'
+import { EXTRA_AGENT_TOOLS } from './agent-tools-extra'
 import { MORE_AGENT_TOOLS } from './agent-tools-more'
 
 export type { AgentArg, AgentTool, AgentToolContext } from './agent-tool-base'
@@ -303,7 +304,18 @@ export const AGENT_TOOLS: readonly AgentTool[] = [
       return 'Went back.'
     }
   },
+  {
+    name: 'go_forward',
+    description: 'Go forward in history.',
+    args: {},
+    changesPage: true,
+    run: (_, context) => {
+      context.doc.defaultView?.history.forward()
+      return 'Went forward.'
+    }
+  },
   ...MORE_AGENT_TOOLS,
+  ...EXTRA_AGENT_TOOLS,
   {
     name: 'wait',
     description: `Wait some milliseconds (up to ${MAX_WAIT_MS}).`,
@@ -386,9 +398,19 @@ export const AGENT_TOOLS: readonly AgentTool[] = [
   }
 ]
 
-/** Tools for this run. `screenshot` is left out without screen capture. */
-export function agentTools(withScreenshots: boolean): readonly AgentTool[] {
-  return withScreenshots
-    ? AGENT_TOOLS
-    : AGENT_TOOLS.filter((tool) => tool.name !== 'screenshot')
+/**
+ * Tools for this run. `screenshot` is left out without screen capture, and
+ * `disabled` tools are left out (`done` and `fail` always stay).
+ */
+export function agentTools(
+  withScreenshots: boolean,
+  disabled: readonly string[] = []
+): readonly AgentTool[] {
+  return AGENT_TOOLS.filter(
+    (tool) =>
+      (withScreenshots || tool.name !== 'screenshot') &&
+      (tool.name === 'done' ||
+        tool.name === 'fail' ||
+        !disabled.includes(tool.name))
+  )
 }

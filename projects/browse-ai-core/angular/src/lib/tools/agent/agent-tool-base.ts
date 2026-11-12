@@ -16,6 +16,8 @@ export interface AgentToolContext {
   remember: (note: string) => void
   /** Opens a URL in a new tab. `blocked` when the browser stopped it. */
   openTab: (url: string, active: boolean) => Promise<'opened' | 'blocked'>
+  /** Words that make a button risky (`agentRiskWords`). */
+  riskWords?: readonly string[]
 }
 
 /** `object` is a JSON object; a JSON string is accepted too. */

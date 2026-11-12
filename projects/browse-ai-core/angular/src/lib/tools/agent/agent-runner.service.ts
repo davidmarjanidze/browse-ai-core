@@ -132,9 +132,10 @@ export class AgentRunnerService {
 
   async run(request: ToolRequest): Promise<ToolResult> {
     const strings = this.#config.strings()
-    const { maxSteps, maxDurationMs } = this.#config.config().agent
+    const { maxSteps, maxDurationMs, disabledTools } =
+      this.#config.config().agent
     const withScreens = this.canScreenshot()
-    const tools = agentTools(withScreens)
+    const tools = agentTools(withScreens, disabledTools)
     const schemas = AGENT_TUNING.strictSchema
       ? [agentToolSchema(tools), agentResponseSchema(tools)]
       : [agentResponseSchema(tools)]
@@ -174,7 +175,8 @@ export class AgentRunnerService {
       askUser: (question) => this.#ask(question, abort.signal),
       notify: (text) => this.#notices.post(text),
       remember: (note) => memory.push(note),
-      openTab: (url, active) => openInNewTab(url, active)
+      openTab: (url, active) => openInNewTab(url, active),
+      riskWords: strings.agentRiskWords
     }
 
     this.steps.set([])

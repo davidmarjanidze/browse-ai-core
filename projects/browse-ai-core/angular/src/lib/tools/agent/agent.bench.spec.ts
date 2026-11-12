@@ -1,5 +1,10 @@
 import { TestBed } from '@angular/core/testing'
-import { AiPromptInput, AiProvider, AiSession } from 'browse-ai-core'
+import {
+  AgentToolName,
+  AiPromptInput,
+  AiProvider,
+  AiSession
+} from 'browse-ai-core'
 import { promptText, provideTestChat } from '../../../../../testing/fake-ai'
 import type { ToolRequest } from '../../chat/tool-runner'
 import { AgentRunnerService } from './agent-runner.service'
@@ -220,7 +225,23 @@ function request(text: string): ToolRequest {
   }
 }
 
-async function bench(page: () => void, steps: Step[]): Promise<Stats> {
+/** Tools added after the baseline (T-018), left out to compare like with like. */
+const T018_TOOLS: AgentToolName[] = [
+  'find_images',
+  'extract_list',
+  'read_selection',
+  'set_value',
+  'close_overlay',
+  'right_click',
+  'wait_for_url',
+  'go_forward'
+]
+
+async function bench(
+  page: () => void,
+  steps: Step[],
+  disabledTools: AgentToolName[] = T018_TOOLS
+): Promise<Stats> {
   const stats: Stats = {
     calls: 0,
     systemChars: 0,
@@ -240,7 +261,7 @@ async function bench(page: () => void, steps: Step[]): Promise<Stats> {
       providers: provideTestChat({
         aiProvider: scriptedModel(steps, stats),
         features: { agentMode: true },
-        agent: { confirm: 'never' }
+        agent: { confirm: 'never', disabledTools }
       })
     })
     const agent = TestBed.inject(AgentRunnerService)
@@ -302,5 +323,16 @@ describe('Agent Mode benchmark (T-011)', () => {
     results['list'] = await bench(listPage, listSteps)
     expect(results['list'].status).toContain('Read the list.')
     checkTargets(results['list'], BASELINE.list)
+  }, 30_000)
+
+  // T-018 R7.3: with every tool on, the shop flow still fits Nano's context.
+  it('shop flow with every tool', async () => {
+    results['shopAllTools'] = await bench(shopPage, shopSteps, [])
+    const stats = results['shopAllTools']
+    expect(stats.status).toContain('Added two red shirts.')
+    expect(stats.restarts).toBe(0)
+    expect(tokens('x'.repeat(stats.systemChars))).toBeLessThan(
+      CONTEXT_TOKENS / 4
+    )
   }, 30_000)
 })

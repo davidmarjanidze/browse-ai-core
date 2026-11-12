@@ -39,6 +39,10 @@ sent), 2026-11-12, from the user's Gemini Nano runs. Shipped in 0.8.2;
 form filling about 3x faster in the user's run. The extension uses
 `^0.8.2`.
 
+T-018 (2026-11-12): done and archived. 8 more Agent Mode tools and
+`agent.disabledTools`, shipped in 0.9.0. Checked with jsdom tests only;
+the Gemini Nano check is T-019.
+
 Next step: T-003 (Watch Mode check with Gemini Nano; Agent Mode was checked
-by the user on 2026-11-12), then T-017 (test the speed switches one at a
-time), T-013, T-014.
+by the user on 2026-11-12), then T-019 (the T-018 tools with Gemini Nano),
+T-017 (test the speed switches one at a time), T-013, T-014.

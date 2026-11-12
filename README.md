@@ -620,9 +620,11 @@ provider. Recordings stop after 60 seconds and are not saved.
 Pick Agent Mode under Agents in the Tools select and describe a task, for example "Add the cheapest
 red shirt in size M to the cart".
 
-The assistant works in steps. Each step it reads the visible buttons, links
-and fields of the page (with a number for each), picks one action and runs
-it: click, type, choose an option, check a box, press a key, hover, scroll,
+Agent Mode is an agent loop: the model looks at the page, picks one tool,
+the chat runs it and sends back the result, and this repeats until the task
+is done, the model needs you, or a limit is reached. Each step it reads the
+visible buttons, links and fields of the page (with a number for each),
+picks one action and runs it: click, type, choose an option, check a box, press a key, hover, scroll,
 go back, or wait for something to appear or for the page to stop loading. It
 can also take a screenshot with the numbers drawn on it, and ask you a
 question; your next message is the answer. The steps are listed above the
@@ -638,6 +640,15 @@ tab), read the page's text in parts, read a table, scroll inside a list or a
 dialog, double-click, fill several fields in one step, point out an element
 to you with a message in the chat, and save short notes for itself (they are
 sent with every later step, so it doesn't forget prices or names it found).
+
+It can also find images by their alt text, caption or file name (also ones
+further down the page), read a list of products or results with the title,
+price, rating and link of each item (sorted by price or rating in code, so
+"the cheapest" is picked by code, not by the model), set date, time, range
+and color inputs, close a pop-up or cookie banner (it clicks close, reject or
+no thanks, and never accept or agree), right-click to open a page's own menu,
+read the text you selected on the page, wait for the address to change on
+single-page apps, and go forward in history.
 
 In a browser extension, new tabs are opened by the background worker: it gets
 `{ type: 'OPEN_TAB', url, active }` (`OPEN_TAB_MESSAGE`) and should open the
@@ -655,10 +666,15 @@ chat.config = {
   agent: {
     maxSteps: 25, // default
     maxDurationMs: 300000, // default, 5 minutes
-    confirm: 'risky' // 'risky' (default), 'always' or 'never'
+    confirm: 'risky', // 'risky' (default), 'always' or 'never'
+    disabledTools: [] // default; for example ['right_click', 'open_in_new_tab']
   }
 }
 ```
+
+`disabledTools` turns single tools off: they are left out of the prompt and a
+call to one is an error. `done` and `fail` are always kept. `AgentToolName`
+and `AGENT_TOOL_NAMES` list every tool name.
 
 Nothing runs until the user picks the tool and sends a task. To hide it from
 the Tools select, set `features: { agentMode: false }`. The run ends when the

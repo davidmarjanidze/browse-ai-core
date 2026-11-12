@@ -93,7 +93,8 @@ describe('agent and watch options', () => {
     expect(config.agent).toEqual({
       maxSteps: 25,
       maxDurationMs: 300_000,
-      confirm: 'risky'
+      confirm: 'risky',
+      disabledTools: []
     })
     expect(config.watch).toEqual({ intervalMs: 15_000, threshold: 0.7 })
   })

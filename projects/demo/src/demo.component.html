@@ -30,6 +30,10 @@
   <form style="display: flex; flex-wrap: wrap; gap: 8px">
     <label>Name <input name="name" /></label>
     <label>Email <input name="email" type="email" /></label>
+    <label>Delivery date <input name="date" type="date" /></label>
+    <label
+      >Gift wrap level <input name="wrap" type="range" min="0" max="10"
+    /></label>
   </form>
 
   <h2>Shop (try Agent Mode)</h2>
@@ -57,6 +61,19 @@
     <p>Order placed.</p>
   }
 
+  <p>
+    <img
+      [src]="plane"
+      alt="Small airplane in the sky"
+      width="160"
+      height="80"
+    />
+  </p>
+  <p>
+    Step {{ step() }}
+    <a href="?step=2" (click)="nextStep($event)">Next step</a>
+  </p>
+
   <h2>Ticker (try Watch Mode)</h2>
   <p id="ticker">ACME stock: ${{ price() }}</p>
 
@@ -65,5 +82,24 @@
     <browse-ai-core mode="inline" [palette]="palette()" [theme]="theme()" />
   </div>
 </main>
+
+@if (cookies()) {
+  <div
+    role="dialog"
+    aria-label="Cookies"
+    style="
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px;
+      background: #eee;
+    "
+  >
+    We use cookies.
+    <button type="button" (click)="cookies.set(false)">Accept all</button>
+    <button type="button" (click)="cookies.set(false)">Reject all</button>
+  </div>
+}
 
 <browse-ai-core [palette]="palette()" [theme]="theme()" [(open)]="open" />

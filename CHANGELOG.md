@@ -5,6 +5,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-12
+
+### Added
+
+- Agent Mode tools: find images by alt text, caption or file name; read a list of products or results with price, rating and link, sorted in code; set date, time, range and color inputs; close a pop-up or cookie banner without accepting it; right-click; read the user's selected text; wait for the address to change; go forward.
+- `agent.disabledTools` turns single Agent Mode tools off. New exports `AgentToolName`, `AGENT_TOOL_NAMES` and `REQUIRED_AGENT_TOOLS`.
+
 ## [0.8.2] - 2026-11-12
 
 ### Fixed

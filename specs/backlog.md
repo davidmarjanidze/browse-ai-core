@@ -1,6 +1,6 @@
 # Backlog
 
-Next ID: T-018
+Next ID: T-020
 
 ## High
 
@@ -41,6 +41,14 @@ From T-011. Turn on one `AGENT_TUNING` switch at a time (`reuseSnapshot`,
 `quickSettle`, `strictSchema`, `shortToolLines`, `pageDiffs`), run the form,
 Google Calendar and pexels tasks, and keep only the switches that don't make
 results worse. Remove the code of the others.
+
+### T-019 · Check the T-018 Agent Mode tools with Gemini Nano
+
+From T-018. On the demo (`npm start`): "close the cookie banner", "set the
+delivery date to next Friday", "scroll to the airplane picture", "add the
+cheapest shirt to the cart", "go to the next step and wait for the address".
+Then on one real shop and one site with a cookie banner. Record which tools
+the model picks and whether they work; open items for problems found.
 
 ### T-004 · Native tool calling for Agent Mode
 

@@ -1,3 +1,8 @@
+import {
+  AGENT_TOOL_NAMES,
+  type AgentToolName,
+  REQUIRED_AGENT_TOOLS
+} from './agent-tool-names'
 import type { AiPromptMessage, AiProvider } from './ai-provider'
 import type { BuiltInToolsOptions } from './built-in-tools'
 import { chromeLanguageModelProvider } from './ai-provider'
@@ -125,6 +130,8 @@ export interface BrowseAiCoreAgentOptions {
   maxDurationMs?: number
   /** Default `risky`: ask before pay, send, delete, submit and leaving the page. */
   confirm?: AgentConfirmMode
+  /** Tools the agent may not use. Default `[]`. `done` and `fail` are always kept. */
+  disabledTools?: readonly AgentToolName[]
 }
 
 export interface BrowseAiCoreWatchOptions {
@@ -226,7 +233,8 @@ const CONFIRM_MODES: readonly AgentConfirmMode[] = ['risky', 'always', 'never']
 export const DEFAULT_AGENT_OPTIONS: Required<BrowseAiCoreAgentOptions> = {
   maxSteps: 25,
   maxDurationMs: 300_000,
-  confirm: 'risky'
+  confirm: 'risky',
+  disabledTools: []
 }
 
 export const DEFAULT_WATCH_OPTIONS: Required<BrowseAiCoreWatchOptions> = {
@@ -319,7 +327,18 @@ export function resolveConfig(
         agent.maxDurationMs,
         DEFAULT_AGENT_OPTIONS.maxDurationMs
       ),
-      confirm: pick(CONFIRM_MODES, agent.confirm, DEFAULT_AGENT_OPTIONS.confirm)
+      confirm: pick(
+        CONFIRM_MODES,
+        agent.confirm,
+        DEFAULT_AGENT_OPTIONS.confirm
+      ),
+      disabledTools: Array.isArray(agent.disabledTools)
+        ? agent.disabledTools.filter(
+            (name) =>
+              AGENT_TOOL_NAMES.includes(name) &&
+              !REQUIRED_AGENT_TOOLS.includes(name)
+          )
+        : DEFAULT_AGENT_OPTIONS.disabledTools
     },
     watch: {
       intervalMs: Math.max(

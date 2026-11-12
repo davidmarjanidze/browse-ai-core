@@ -3,6 +3,7 @@
  * Components live in 'browse-ai-core/angular', 'browse-ai-core/element',
  * 'browse-ai-core/react' and 'browse-ai-core/vue'.
  */
+export * from './lib/agent-tool-names'
 export * from './lib/ai-provider'
 export * from './lib/ai-support'
 export * from './lib/built-in-tools'

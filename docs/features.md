@@ -181,7 +181,14 @@ its tools are on. Each tool shows a green "How to use" box with its steps
   `agent-tools-more.ts`: `open_in_new_tab` (background worker message
   `OPEN_TAB`, else `window.open`, else the link is posted in the chat),
   `read_page_text`, `read_table`, `scroll_inside`, `double_click`,
-  `fill_form`, `show_user` and `remember` (notes sent with every step). When the model session is
+  `fill_form`, `show_user` and `remember` (notes sent with every step). T-018
+  tools are in `agent-tools-extra.ts`: `find_images` (`page-images.ts`),
+  `extract_list` (`page-lists.ts`; repeated siblings with the same tag and
+  class, prices and ratings parsed and sorted in code), `set_value`,
+  `close_overlay` (`page-overlays.ts`; clicks close or decline, never agree
+  or risk words, else Escape), `right_click`, `read_selection` and
+  `wait_for_url`; `go_forward` is next to `go_back`. `agent.disabledTools`
+  leaves tools out of the prompt and schema (`done` and `fail` stay). When the model session is
   75% full, a new one starts with a recap of the steps. Speed changes from
   T-011 are in the code but off by default (`agent-tuning.ts`), because
   Gemini Nano did worse with them; turn one on at a time to test it. With

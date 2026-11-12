@@ -72,12 +72,17 @@ export function riskOf(
     'select_option',
     'set_checked',
     'go_back',
+    'go_forward',
     'double_click',
     'fill_form',
-    'open_in_new_tab'
+    'open_in_new_tab',
+    'set_value',
+    'right_click',
+    'close_overlay'
   ].includes(action)
   if (!changes) return null
-  if (action === 'go_back') return mode === 'never' ? null : 'navigate'
+  if (action === 'go_back' || action === 'go_forward')
+    return mode === 'never' ? null : 'navigate'
   if (mode === 'never') return null
   if (mode === 'always') return 'always'
   if (!element) return null

@@ -138,3 +138,45 @@ export function waitForIdle(
     signal?.addEventListener('abort', onAbort, { once: true })
   })
 }
+
+/**
+ * Resolves with the new address once `location.href` changes (or contains
+ * `contains`, when given), or `timeout`. Single-page apps change the address
+ * with `pushState`, which fires no event, so the address is also polled.
+ */
+export function waitForUrl(
+  doc: Document,
+  contains: string,
+  timeoutMs: number,
+  signal?: AbortSignal
+): Promise<string> {
+  const view = doc.defaultView
+  const href = (): string => view?.location.href ?? doc.URL
+  const start = href()
+  const done = (): boolean =>
+    contains ? href().includes(contains) : href() !== start
+  if (signal?.aborted) return Promise.reject(stopped())
+  if (done()) return Promise.resolve(href())
+
+  return new Promise((resolve, reject) => {
+    const poll = setInterval(() => test(), POLL_MS / 2)
+    const timer = setTimeout(() => finish(() => resolve('timeout')), timeoutMs)
+    const onAbort = (): void => finish(() => reject(stopped()))
+    const test = (): void => {
+      if (done()) finish(() => resolve(href()))
+    }
+
+    function finish(action: () => void): void {
+      clearInterval(poll)
+      clearTimeout(timer)
+      view?.removeEventListener('popstate', test)
+      view?.removeEventListener('hashchange', test)
+      signal?.removeEventListener('abort', onAbort)
+      action()
+    }
+
+    view?.addEventListener('popstate', test)
+    view?.addEventListener('hashchange', test)
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
+}
