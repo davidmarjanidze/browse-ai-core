@@ -22,7 +22,8 @@ Say so in the commit message.
    `projects/browse-ai-core/package.json` and commit that as
    `chore: release <version>`.
 2. Log in to npm or provide a token. `.npmrc.example` shows the format; never
-   commit a token.
+   commit a token or pass it on the command line (it ends up in shell and
+   agent logs). Use `NPM_TOKEN` or `~/.npmrc`.
 3. Run:
 
    ```console

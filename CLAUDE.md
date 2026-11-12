@@ -65,7 +65,10 @@ npm run test:element     # load the built element in jsdom
 npm run npm-publish      # test, build, then npm publish (needs NPM_TOKEN)
 node scripts/examples.mjs <package> <dir>   # build the examples against a package
 npm run prettier         # format everything
+npx ng test browse-ai-core --no-watch --include=projects/browse-ai-core/<path>.spec.ts  # one file
 ```
+
+No lockfile is committed (`package-lock.json` is gitignored): use `npm install`, not `npm ci`.
 
 ## Code Style
 
@@ -77,6 +80,7 @@ npm run prettier         # format everything
 - Colors only through `bac-*` Tailwind tokens (`--bac-*` variables). No raw
   colors in templates.
 - All UI text comes from `strings` (`DEFAULT_STRINGS` in the core entry).
+  Tool names use Title Case ("Subject Finder", not "Subject finder").
 - README and docs: short plain sentences, no marketing words.
 
 ## Specs

@@ -8,7 +8,7 @@ specs/
 ├── roadmap.md       # Direction: vision, non-goals, milestones
 ├── backlog.md       # Prioritized work that has not started
 ├── progress.md      # What is happening right now + session handoff
-├── changelog.md     # What shipped (append-only)
+├── changelog.md     # Pointer only; shipped work goes in the root CHANGELOG.md
 ├── active/          # One spec per item being specified or built
 │   └── _template.md
 ├── completed/       # Archived specs (read-only)
@@ -69,7 +69,7 @@ ADRs (`decisions/`) can be written at any stage.
 | `roadmap.md`     | "Where are we going?"           | Priorities or long-term direction change. No implementation details. |
 | `backlog.md`     | "What's next, in what order?"   | Work is found, re-prioritized, started or dropped.                   |
 | `progress.md`    | "What is happening right now?"  | Continuously, and at the end of every work session.                  |
-| `changelog.md`   | "What shipped, and when?"       | Every completed item. Append-only; never rewrite history.            |
+| `../CHANGELOG.md` | "What shipped, and when?"      | Every completed item. Append-only; never rewrite history.            |
 | `active/*.md`    | "What exactly are we building?" | Before and during implementation. Must always match reality.         |
 | `completed/*.md` | "Why was it built this way?"    | Only once, when archiving. Read-only afterwards.                     |
 | `decisions/*.md` | "Why did we choose X over Y?"   | A significant technical decision is made. Append-only.               |
@@ -92,7 +92,7 @@ convention.
 
 ## Releases
 
-`changelog.md` follows [Keep a Changelog](https://keepachangelog.com). Record
+The root `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com). Record
 finished work under `Unreleased`. On release, rename that section to the version
 and date, then start a new `Unreleased` section. Use
 [SemVer](https://semver.org) if the project is versioned; otherwise use the date

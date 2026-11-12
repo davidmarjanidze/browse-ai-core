@@ -41,7 +41,7 @@ spec track.
 
 1. Implement directly from the backlog item.
 2. Verify every acceptance criterion.
-3. Add an entry under `Unreleased` in `specs/changelog.md`.
+3. Add an entry under `Unreleased` in the root `CHANGELOG.md`.
 4. Remove the item from `specs/backlog.md`.
 
 Then skip to step 6 (handoff).
@@ -104,7 +104,7 @@ Plus any project additions in `principles.md`:
       where practical).
 - [ ] Tests, lint and build pass.
 - [ ] The spec describes what was actually built.
-- [ ] A changelog entry is added under `Unreleased`.
+- [ ] A `CHANGELOG.md` entry is added under `Unreleased`.
 
 ### Archive
 

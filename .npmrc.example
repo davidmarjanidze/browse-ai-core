@@ -1,2 +1,2 @@
-# Copy to ~/.npmrc or pass the token on the command line. Never commit a token.
+# Copy to ~/.npmrc and set NPM_TOKEN in your environment. Never commit a token or pass it on the command line.
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}
