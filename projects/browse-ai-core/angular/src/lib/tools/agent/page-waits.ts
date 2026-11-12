@@ -81,17 +81,23 @@ export function waitFor(options: WaitForOptions): Promise<WaitForResult> {
 
 /**
  * Resolves `idle` once the page has had no DOM changes and no new network
- * requests for `IDLE_MS`, or `timeout` after `timeoutMs`.
+ * requests for `IDLE_MS`, or `timeout` after `timeoutMs`. With a shorter
+ * `firstQuietMs`, a page that stays quiet from the start counts as idle
+ * sooner; after any change the full `IDLE_MS` applies.
  */
 export function waitForIdle(
   doc: Document,
   timeoutMs: number,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  firstQuietMs = IDLE_MS
 ): Promise<'idle' | 'timeout'> {
   if (signal?.aborted) return Promise.reject(stopped())
   return new Promise((resolve, reject) => {
     const view = doc.defaultView
-    let quietTimer = setTimeout(() => finish(() => resolve('idle')), IDLE_MS)
+    let quietTimer = setTimeout(
+      () => finish(() => resolve('idle')),
+      firstQuietMs
+    )
     const bump = (): void => {
       clearTimeout(quietTimer)
       quietTimer = setTimeout(() => finish(() => resolve('idle')), IDLE_MS)

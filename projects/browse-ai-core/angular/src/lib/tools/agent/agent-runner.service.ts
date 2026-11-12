@@ -27,13 +27,17 @@ import {
   AgentCall,
   AgentStepRecord,
   agentResponseSchema,
+  agentToolSchema,
   buildAgentSystemPrompt,
   buildStepPrompt,
   parseAgentCall
 } from './agent-protocol'
 import { captureWithRefs, flashElement, shrinkImage } from './agent-screen'
 import { AgentTool, AgentToolContext, agentTools } from './agent-tools'
-import { RefMap, formatSnapshot, nameOf, takeSnapshot } from './page-snapshot'
+import { AGENT_TUNING } from './agent-tuning'
+import { describePage } from './page-diff'
+import { PageObserver } from './page-observer'
+import { PageSnapshot, RefMap, nameOf } from './page-snapshot'
 import { waitForIdle } from './page-waits'
 import { RiskReason, riskOf } from './risk-check'
 
@@ -41,6 +45,10 @@ import { RiskReason, riskOf } from './risk-check'
 export const MAX_BAD_ANSWERS = 3
 /** Wait for the page to settle after an action, in ms. */
 const SETTLE_MS = 3_000
+/** With `AGENT_TUNING.quickSettle`: a page with no change this long counts as settled. */
+const QUICK_SETTLE_MS = 150
+/** Same step this many times with no page change gets a NOTE. */
+const REPEAT_LIMIT = 3
 /** Start a new model session when this share of its context is used. */
 const CONTEXT_LIMIT = 0.75
 
@@ -127,7 +135,15 @@ export class AgentRunnerService {
     const { maxSteps, maxDurationMs } = this.#config.config().agent
     const withScreens = this.canScreenshot()
     const tools = agentTools(withScreens)
+    const schemas = AGENT_TUNING.strictSchema
+      ? [agentToolSchema(tools), agentResponseSchema(tools)]
+      : [agentResponseSchema(tools)]
     const refs = new RefMap()
+    const observer = new PageObserver(this.#document, this.#host, refs)
+    /** The page the model saw last, base for the next diff. */
+    let seen: PageSnapshot | null = null
+    /** Observations in a row with no page change. */
+    let quiet = 0
     const records: AgentStepRecord[] = []
     const memory: string[] = []
     const abort = new AbortController()
@@ -167,6 +183,7 @@ export class AgentRunnerService {
     this.running.set(true)
     let ending: Ending = { status: 'stopped', text: '' }
     try {
+      observer.start()
       session = await this.#newSession(tools, withScreens)
       let recap = false
       let note: string | undefined
@@ -182,9 +199,20 @@ export class AgentRunnerService {
           }
           break
         }
-        const page = formatSnapshot(
-          takeSnapshot(this.#document, this.#host, refs)
-        )
+        if (!AGENT_TUNING.reuseSnapshot) observer.invalidate()
+        const snapshot = observer.snapshot()
+        const view = describePage(seen, snapshot, {
+          full: !AGENT_TUNING.pageDiffs || recap || image !== null
+        })
+        quiet = view.changed ? 0 : quiet + 1
+        if (quiet >= REPEAT_LIMIT - 1 && repeats(records, REPEAT_LIMIT))
+          note = [
+            note,
+            `Your last ${REPEAT_LIMIT} steps were the same and the page did not change. Try something else.`
+          ]
+            .filter(Boolean)
+            .join(' ')
+        const page = view.text
         const updates = this.updates()
         const prompt = buildStepPrompt({
           task: request.text,
@@ -209,7 +237,7 @@ export class AgentRunnerService {
             session,
             prompt,
             sent,
-            tools,
+            schemas,
             abort.signal
           )
         } catch (error) {
@@ -219,6 +247,7 @@ export class AgentRunnerService {
           recap = true
           continue
         }
+        seen = snapshot
         if (isSessionNearlyFull(session, CONTEXT_LIMIT)) {
           session.destroy?.()
           session = await this.#newSession(tools, withScreens)
@@ -257,6 +286,8 @@ export class AgentRunnerService {
           break
         }
         await this.#runStep(tool, call, context, records)
+        // Hover and other CSS-only changes leave no DOM record.
+        if (tool.changesPage) observer.invalidate()
       }
     } catch (error) {
       if (timedOut) {
@@ -280,6 +311,7 @@ export class AgentRunnerService {
       }
     } finally {
       clearTimeout(timer)
+      observer.stop()
       request.signal.removeEventListener('abort', stopOuter)
       session?.destroy?.()
       this.running.set(false)
@@ -344,7 +376,12 @@ export class AgentRunnerService {
       result = error instanceof Error ? error.message : String(error)
     }
     if (status === 'ok' && tool.changesPage) {
-      await waitForIdle(this.#document, SETTLE_MS, context.signal)
+      await waitForIdle(
+        this.#document,
+        SETTLE_MS,
+        context.signal,
+        AGENT_TUNING.quickSettle ? QUICK_SETTLE_MS : undefined
+      )
     }
     this.#record(records, call, label, status, result)
   }
@@ -450,7 +487,10 @@ export class AgentRunnerService {
     const base = getSessionOptions(config)
     return config.aiProvider.createSession({
       ...base,
-      systemPrompt: buildAgentSystemPrompt(tools),
+      systemPrompt: buildAgentSystemPrompt(tools, {
+        short: AGENT_TUNING.shortToolLines,
+        diffs: AGENT_TUNING.pageDiffs
+      }),
       initialPrompts: undefined,
       expectedInputs: withImages ? ['text', 'image'] : ['text']
     })
@@ -460,7 +500,7 @@ export class AgentRunnerService {
     session: AiSession,
     text: string,
     image: Blob | null,
-    tools: readonly AgentTool[],
+    schemas: readonly object[],
     signal: AbortSignal
   ): Promise<string> {
     const input: AiPromptInput = image
@@ -474,6 +514,15 @@ export class AgentRunnerService {
           }
         ]
       : text
-    return promptWithSchema(session, input, agentResponseSchema(tools), signal)
+    return promptWithSchema(session, input, schemas, signal)
   }
+}
+
+/** True when the last `count` steps used the same tool with the same args. */
+function repeats(records: readonly AgentStepRecord[], count: number): boolean {
+  if (records.length < count) return false
+  const keys = records
+    .slice(-count)
+    .map((record) => `${record.tool} ${JSON.stringify(record.args)}`)
+  return keys.every((key) => key === keys[0])
 }

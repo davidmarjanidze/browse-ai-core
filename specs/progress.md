@@ -1,6 +1,6 @@
 # Progress
 
-_Last updated: 2026-11-11_
+_Last updated: 2026-11-12_
 
 ## In progress
 
@@ -31,4 +31,14 @@ Quick track T-009 (2026-11-11, from the user): more Agent Mode tools, with
 Quick track T-010 (2026-11-11, from the user): left / right Position in
 settings, saved with the appearance. Shipped in 0.7.0.
 
-Next step: T-003 (run the demo in Chrome with the built-in model).
+T-011 (2026-11-12): done and archived. Shipped in 0.8.0-0.8.2; the
+model-facing speed changes are off by default (`agent-tuning.ts`).
+
+Quick track T-012 (form fields left empty) and T-015 (typed search not
+sent), 2026-11-12, from the user's Gemini Nano runs. Shipped in 0.8.2;
+form filling about 3x faster in the user's run. The extension uses
+`^0.8.2`.
+
+Next step: T-003 (Watch Mode check with Gemini Nano; Agent Mode was checked
+by the user on 2026-11-12), then T-017 (test the speed switches one at a
+time), T-013, T-014.

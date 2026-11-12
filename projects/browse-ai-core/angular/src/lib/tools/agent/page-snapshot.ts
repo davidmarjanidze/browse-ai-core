@@ -34,10 +34,20 @@ export interface PageSnapshot {
   scrollY: number
   scrollHeight: number
   viewport: { width: number; height: number }
-  /** One `[ref] role "name" …` line per element. */
+  /** One `[ref] role "name" … @x,y` line per element. */
   lines: string[]
+  /** The same elements, keyed by ref, with the position kept apart. */
+  items: SnapshotItem[]
   /** Elements that did not fit the budget. */
   omitted: number
+}
+
+export interface SnapshotItem {
+  ref: number
+  /** The line without its position. */
+  text: string
+  /** `@x,y` */
+  at: string
 }
 
 /**
@@ -179,11 +189,21 @@ function stateOf(element: Element): string {
 }
 
 /** Shown, non-empty, and near the viewport (one screen above or below). */
-export function isShown(element: Element, viewportHeight: number): boolean {
-  const rect = element.getBoundingClientRect()
+export function isShown(
+  element: Element,
+  viewportHeight: number,
+  rect: DOMRect = element.getBoundingClientRect()
+): boolean {
+  return hasBox(rect, viewportHeight) && isStyledShown(element)
+}
+
+/** Non-empty and near the viewport. Cheap: no style read. */
+function hasBox(rect: DOMRect, viewportHeight: number): boolean {
   if (rect.width === 0 && rect.height === 0) return false
-  if (rect.bottom < -viewportHeight || rect.top > viewportHeight * 2)
-    return false
+  return !(rect.bottom < -viewportHeight || rect.top > viewportHeight * 2)
+}
+
+function isStyledShown(element: Element): boolean {
   const view = element.ownerDocument.defaultView
   const style = view?.getComputedStyle(element)
   return !(
@@ -194,9 +214,12 @@ export function isShown(element: Element, viewportHeight: number): boolean {
 }
 
 /** True when another page element covers the element's center. */
-function isCovered(element: Element, viewportHeight: number): boolean {
+function isCovered(
+  element: Element,
+  viewportHeight: number,
+  rect: DOMRect
+): boolean {
   const doc = element.ownerDocument
-  const rect = element.getBoundingClientRect()
   const x = rect.left + rect.width / 2
   const y = rect.top + rect.height / 2
   if (y < 0 || y > viewportHeight || typeof doc.elementFromPoint !== 'function')
@@ -219,14 +242,26 @@ export function isOffLimits(element: Element, host: Element | null): boolean {
 }
 
 /** One line per element, as the model sees it. */
-export function describeForModel(ref: number, element: Element): string {
-  const rect = element.getBoundingClientRect()
+export function describeForModel(
+  ref: number,
+  element: Element,
+  rect: DOMRect = element.getBoundingClientRect()
+): string {
+  const item = itemOf(ref, element, rect)
+  return `${item.text} ${item.at}`
+}
+
+function itemOf(ref: number, element: Element, rect: DOMRect): SnapshotItem {
   const state = stateOf(element)
   const href =
     element instanceof HTMLAnchorElement && element.getAttribute('href')
       ? ` href=${clean(element.getAttribute('href'), 60)}`
       : ''
-  return `[${ref}] ${roleOf(element)} "${nameOf(element)}"${state ? ` ${state}` : ''}${href} @${Math.round(rect.left)},${Math.round(rect.top)}`
+  return {
+    ref,
+    text: `[${ref}] ${roleOf(element)} "${nameOf(element)}"${state ? ` ${state}` : ''}${href}`,
+    at: `@${Math.round(rect.left)},${Math.round(rect.top)}`
+  }
 }
 
 /**
@@ -242,29 +277,42 @@ export function takeSnapshot(
   const height = view?.innerHeight ?? 800
   refs.prune()
 
-  const found: Element[] = []
+  // One box read per element; layout reads are the slow part.
+  const found: { element: Element; rect: DOMRect }[] = []
   for (const element of walkElements(doc)) {
     if (!element.matches(INTERACTIVE)) continue
     if (isOffLimits(element, host)) continue
-    if (!isShown(element, height) || isCovered(element, height)) continue
-    found.push(element)
-  }
-  const distance = (element: Element): number => {
     const rect = element.getBoundingClientRect()
+    if (hasBox(rect, height)) found.push({ element, rect })
+  }
+  const distance = (rect: DOMRect): number => {
     if (rect.bottom >= 0 && rect.top <= height) return 0
     return rect.top < 0 ? -rect.bottom : rect.top - height
   }
   const ordered = found
-    .map((element, index) => ({ element, index, distance: distance(element) }))
+    .map((entry, index) => ({
+      ...entry,
+      index,
+      distance: distance(entry.rect)
+    }))
     .sort((a, b) => a.distance - b.distance || a.index - b.index)
 
   const lines: string[] = []
+  const items: SnapshotItem[] = []
   let size = 0
-  for (const { element } of ordered) {
+  let skipped = 0
+  for (const { element, rect } of ordered) {
     if (lines.length >= MAX_ELEMENTS) break
-    const line = describeForModel(refs.add(element), element)
+    // Style and cover checks only for elements that can still fit.
+    if (!isStyledShown(element) || isCovered(element, height, rect)) {
+      skipped++
+      continue
+    }
+    const item = itemOf(refs.add(element), element, rect)
+    const line = `${item.text} ${item.at}`
     if (size + line.length > MAX_SNAPSHOT_CHARS) break
     lines.push(line)
+    items.push(item)
     size += line.length + 1
   }
 
@@ -275,7 +323,8 @@ export function takeSnapshot(
     scrollHeight: doc.documentElement.scrollHeight,
     viewport: { width: view?.innerWidth ?? 0, height },
     lines,
-    omitted: ordered.length - lines.length
+    items,
+    omitted: ordered.length - lines.length - skipped
   }
 }
 

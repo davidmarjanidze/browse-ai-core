@@ -5,6 +5,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-11-12
+
+### Fixed
+
+- Agent Mode can type into number, date and time inputs.
+- Agent Mode `fill_form` accepts field labels as well as element numbers, and the step shows as an error when no field was filled, so the model tries again.
+- Agent Mode tells the model that typed text is not sent yet, so it presses Enter or clicks the search button.
+
+## [0.8.1] - 2026-11-12
+
+### Fixed
+
+- Agent Mode works as in 0.7.1 again on forms, Google Calendar and screenshot tasks. The 0.8.0 speed changes made Gemini Nano lose track of the page; they are now off by default. The same step repeated 3 times with no page change still gets a note.
+
+## [0.8.0] - 2026-11-12
+
+### Changed
+
+- Agent Mode is faster with Gemini Nano. After the first step it sends only the page changes, the tool list in the system prompt is shorter, the answer schema checks each tool's arguments, and the page is not read again when nothing changed. In the benchmark, a run sends 78–87% fewer characters and no longer has to restart the model session.
+
 ## [0.7.1] - 2026-11-11
 
 ### Changed

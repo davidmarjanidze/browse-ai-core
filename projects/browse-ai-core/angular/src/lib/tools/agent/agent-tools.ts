@@ -195,15 +195,18 @@ export const AGENT_TOOLS: readonly AgentTool[] = [
     },
     changesPage: true,
     run: (args, context) => {
-      const value = typeText(
-        target(args, context),
-        String(args['text'] ?? ''),
-        {
-          clear: args['clear'] !== false,
-          submit: args['submit'] === true
-        }
-      )
-      return `Field value is now "${text(value, 80)}".`
+      const element = target(args, context)
+      const submit = args['submit'] === true
+      const value = typeText(element, String(args['text'] ?? ''), {
+        clear: args['clear'] !== false,
+        submit
+      })
+      // Small models stop here and expect the search to run.
+      const notSent =
+        !submit && element instanceof HTMLInputElement
+          ? ' Nothing is sent yet. To search or send it, call press_key with key Enter, or click the search or submit button.'
+          : ''
+      return `Field value is now "${text(value, 80)}".${notSent}`
     }
   },
   {

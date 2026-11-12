@@ -79,6 +79,7 @@ export function flashElement(
   const rect = element.getBoundingClientRect()
   if (rect.width === 0 && rect.height === 0) return
   const box = doc.createElement('div')
+  box.setAttribute('data-browse-ai-core-flash', '')
   box.style.cssText = `pointer-events:none;position:fixed;z-index:2147483646;box-sizing:border-box;border:3px solid ${color};border-radius:4px;left:${rect.left - 3}px;top:${rect.top - 3}px;width:${rect.width + 6}px;height:${rect.height + 6}px;`
   doc.documentElement.appendChild(box)
   setTimeout(() => box.remove(), ms)

@@ -182,7 +182,20 @@ its tools are on. Each tool shows a green "How to use" box with its steps
   `OPEN_TAB`, else `window.open`, else the link is posted in the chat),
   `read_page_text`, `read_table`, `scroll_inside`, `double_click`,
   `fill_form`, `show_user` and `remember` (notes sent with every step). When the model session is
-  75% full, a new one starts with a recap of the steps.
+  75% full, a new one starts with a recap of the steps. Speed changes from
+  T-011 are in the code but off by default (`agent-tuning.ts`), because
+  Gemini Nano did worse with them; turn one on at a time to test it. With
+  them on: after the first step only the page changes are
+  sent (`page-diff.ts`; added, changed and gone refs; positions alone don't
+  count), or "unchanged"; the full list comes back after a new URL, a new
+  session or a screenshot. `page-observer.ts` keeps the last snapshot until
+  the DOM, scroll, size, input or focus changes. The system prompt has one
+  short line per tool. The answer schema has one `anyOf` branch per tool, so
+  args are checked by the model too; a provider that rejects it gets the
+  loose schema, then none. The same step 3 times with no page change gets a
+  NOTE (always on). After an action, a page with no change for 150 ms
+  counts as settled.
+  `agent.bench.spec.ts` measures characters sent, restarts and page reads.
 - **Watch Mode** (spec T-002). The element is picked with the same picker as
   DOM Element to Component (Arrow Up / Down for parent / child). A timer
   (`watch.intervalMs`) reads the element's text (`watched-text.ts`); the model

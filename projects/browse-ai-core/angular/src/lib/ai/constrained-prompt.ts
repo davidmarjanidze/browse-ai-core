@@ -1,27 +1,34 @@
 import { AiPromptInput, AiSession } from 'browse-ai-core'
 import { isQuotaExceededError } from './stream-reader'
 
-const unsupported = new WeakSet<AiSession>()
+/** How many schemas of the list each session has rejected. */
+const rejected = new WeakMap<AiSession, number>()
 
 /**
  * Prompts with a JSON schema (`responseConstraint`). If the provider rejects
- * the option, it asks again without it and remembers that for the session.
- * The answer is always checked by the caller.
+ * the option, it tries the next schema of the list, then no schema, and
+ * remembers that for the session. The answer is always checked by the caller.
  */
 export async function promptWithSchema(
   session: AiSession,
   input: AiPromptInput,
-  schema: object,
+  schema: object | readonly object[],
   signal: AbortSignal
 ): Promise<string> {
-  if (!unsupported.has(session)) {
+  const schemas = (
+    Array.isArray(schema) ? schema : [schema]
+  ) as readonly object[]
+  for (;;) {
+    const index = rejected.get(session) ?? 0
+    const next = schemas[index]
+    if (!next) break
     try {
-      return await session.prompt(input, { signal, responseConstraint: schema })
+      return await session.prompt(input, { signal, responseConstraint: next })
     } catch (error) {
       if (signal.aborted || isQuotaExceededError(error)) throw error
       const name = error instanceof Error ? error.name : ''
       if (name !== 'NotSupportedError' && name !== 'TypeError') throw error
-      unsupported.add(session)
+      rejected.set(session, index + 1)
     }
   }
   return session.prompt(input, { signal })

@@ -24,6 +24,29 @@ const MAX_TABLE_ROWS = 30
 const MAX_FORM_FIELDS = 15
 
 /** An object argument, also when the model sent it as a JSON string. */
+/**
+ * The ref for a `fill_form` key. Small models often use the field's label
+ * instead of its number, so a label that matches one listed field works too.
+ */
+export function refFor(key: string, context: AgentToolContext): number {
+  const number = Number(key.replace(/^\[|\]$/gu, ''))
+  if (Number.isFinite(number) && key.trim() !== '') return number
+  const wanted = key.trim().toLowerCase()
+  const entries = context.refs.entries()
+  const exact = entries.find(
+    ([, element]) => nameOf(element).toLowerCase() === wanted
+  )
+  const partial = entries.filter(([, element]) =>
+    nameOf(element).toLowerCase().includes(wanted)
+  )
+  const found = exact ?? (partial.length === 1 ? partial[0] : undefined)
+  if (!found)
+    throw new ActionError(
+      `No single listed field is called "${key}". Use its ref number.`
+    )
+  return found[0]
+}
+
 export function objectArg(value: unknown): Record<string, unknown> {
   if (value && typeof value === 'object' && !Array.isArray(value))
     return value as Record<string, unknown>
@@ -243,10 +266,13 @@ export const MORE_AGENT_TOOLS: readonly AgentTool[] = [
       if (!entries.length) throw new ActionError('"fields" is empty.')
       const results = entries.map(([key, value]) => {
         try {
-          const element = target({ ref: key }, context)
+          const element = target({ ref: refFor(key, context) }, context)
           const label = nameOf(element) || `[${key}]`
           if (element instanceof HTMLSelectElement)
-            return `${label}: selected "${selectOption(element, String(value))}"`
+            return {
+              ok: true,
+              text: `${label}: selected "${selectOption(element, String(value))}"`
+            }
           if (
             element instanceof HTMLInputElement &&
             (element.type === 'checkbox' || element.type === 'radio')
@@ -254,15 +280,26 @@ export const MORE_AGENT_TOOLS: readonly AgentTool[] = [
             const on =
               value === true ||
               /^(true|yes|on|1|checked)$/iu.test(String(value))
-            return `${label}: ${setChecked(element, on) ? 'checked' : 'unchecked'}`
+            return {
+              ok: true,
+              text: `${label}: ${setChecked(element, on) ? 'checked' : 'unchecked'}`
+            }
           }
           typeText(element, String(value ?? ''))
-          return `${label}: filled`
+          return { ok: true, text: `${label}: filled` }
         } catch (error) {
-          return `[${key}]: error: ${error instanceof Error ? error.message : String(error)}`
+          return {
+            ok: false,
+            text: `[${key}]: error: ${error instanceof Error ? error.message : String(error)}`
+          }
         }
       })
-      return results.join('\n')
+      const report = results.map((result) => result.text).join('\n')
+      if (!results.some((result) => result.ok))
+        throw new ActionError(
+          `No field was filled. Use ref numbers from ELEMENTS as keys, e.g. {"fields": {"12": "Ana"}}.\n${report}`
+        )
+      return report
     }
   },
   {

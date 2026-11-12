@@ -1,5 +1,26 @@
 import { isTextField, setFieldValue } from '../../page/insert-text'
 
+/** Inputs that take a typed value but are not text (no cursor). */
+const VALUE_INPUT_TYPES = new Set([
+  'number',
+  'date',
+  'time',
+  'datetime-local',
+  'month',
+  'week'
+])
+
+/** A text field, or a number, date or time input. */
+export function isTypeable(element: Element): element is HTMLElement {
+  if (isTextField(element)) return true
+  return (
+    element instanceof HTMLInputElement &&
+    VALUE_INPUT_TYPES.has(element.type) &&
+    !element.disabled &&
+    !element.readOnly
+  )
+}
+
 /** Thrown for actions that can't run; the text goes back to the model. */
 export class ActionError extends Error {}
 
@@ -126,7 +147,7 @@ export function typeText(
   text: string,
   options: { clear?: boolean; submit?: boolean } = {}
 ): string {
-  if (!isTextField(element))
+  if (!isTypeable(element))
     throw new ActionError(
       'The element is not a text field that can be typed into.'
     )
