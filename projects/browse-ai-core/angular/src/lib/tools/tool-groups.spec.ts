@@ -32,13 +32,13 @@ describe('tool groups', () => {
     for (const tool of BUILT_IN_TOOL_IDS) expect(grouped).toContain(tool)
   })
 
-  it('lists tools by group, with Forms first and Agents second', () => {
+  it('lists tools by group, with Agents first and Forms second', () => {
     const tools = allTools()
     expect(tools.slice(0, 4).map((tool) => [tool.id, tool.group])).toEqual([
-      ['form-filler', 'Forms'],
-      ['form-validator', 'Forms'],
       ['agent-mode', 'Agents'],
-      ['watch-mode', 'Agents']
+      ['watch-mode', 'Agents'],
+      ['form-filler', 'Forms'],
+      ['form-validator', 'Forms']
     ])
     const headings = groupOptions(
       tools.map((tool) => ({
@@ -48,8 +48,8 @@ describe('tool groups', () => {
       }))
     ).map((group) => group.label)
     expect(headings).toEqual([
-      'Forms',
       'Agents',
+      'Forms',
       'Read & understand',
       'Write',
       'Save & extract',
